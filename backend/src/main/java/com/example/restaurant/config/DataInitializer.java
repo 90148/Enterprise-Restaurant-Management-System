@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Component
@@ -19,6 +20,12 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final FloorRepository floorRepository;
     private final RestaurantTableRepository tableRepository;
+    private final MenuCategoryRepository categoryRepository;
+    private final MenuItemRepository menuItemRepository;
+    private final ModifierGroupRepository modifierGroupRepository;
+    private final InventoryUnitRepository unitRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final RecipeRepository recipeRepository;
 
     public DataInitializer(
             OutletRepository outletRepository,
@@ -27,7 +34,13 @@ public class DataInitializer implements CommandLineRunner {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             FloorRepository floorRepository,
-            RestaurantTableRepository tableRepository) {
+            RestaurantTableRepository tableRepository,
+            MenuCategoryRepository categoryRepository,
+            MenuItemRepository menuItemRepository,
+            ModifierGroupRepository modifierGroupRepository,
+            InventoryUnitRepository unitRepository,
+            InventoryItemRepository inventoryItemRepository,
+            RecipeRepository recipeRepository) {
         this.outletRepository = outletRepository;
         this.permissionRepository = permissionRepository;
         this.roleRepository = roleRepository;
@@ -35,6 +48,12 @@ public class DataInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
         this.floorRepository = floorRepository;
         this.tableRepository = tableRepository;
+        this.categoryRepository = categoryRepository;
+        this.menuItemRepository = menuItemRepository;
+        this.modifierGroupRepository = modifierGroupRepository;
+        this.unitRepository = unitRepository;
+        this.inventoryItemRepository = inventoryItemRepository;
+        this.recipeRepository = recipeRepository;
     }
 
     @Override
@@ -163,6 +182,67 @@ public class DataInitializer implements CommandLineRunner {
         createTableIfAbsent(terraceFloor, "TR-02", 4, TableShape.ROUND, 240, 60, TableStatus.AVAILABLE);
         createTableIfAbsent(terraceFloor, "TR-03", 6, TableShape.RECTANGLE, 400, 60, TableStatus.OCCUPIED);
         createTableIfAbsent(terraceFloor, "TR-04", 2, TableShape.SQUARE, 80, 220, TableStatus.RESERVED);
+
+        // 6. Seed Inventory Units
+        InventoryUnit kg = getOrCreateUnit("Kilogram", "kg");
+        InventoryUnit g = getOrCreateUnit("Gram", "g");
+        InventoryUnit l = getOrCreateUnit("Liter", "L");
+        InventoryUnit ml = getOrCreateUnit("Milliliter", "ml");
+        InventoryUnit pcs = getOrCreateUnit("Piece", "pcs");
+
+        // 7. Seed Raw Inventory Items for defaultOutlet
+        InventoryItem dough = getOrCreateInventoryItem(defaultOutlet, "Pizza Dough (Ball)", "ING-001", pcs, new BigDecimal("0.75"), new BigDecimal("100.000"));
+        InventoryItem tomatoSauce = getOrCreateInventoryItem(defaultOutlet, "San Marzano Tomato Sauce", "ING-002", kg, new BigDecimal("4.50"), new BigDecimal("50.000"));
+        InventoryItem mozzarella = getOrCreateInventoryItem(defaultOutlet, "Fresh Mozzarella Cheese", "ING-003", kg, new BigDecimal("8.00"), new BigDecimal("40.000"));
+        InventoryItem pasta = getOrCreateInventoryItem(defaultOutlet, "Artisan Penne Pasta", "ING-004", kg, new BigDecimal("3.00"), new BigDecimal("60.000"));
+        InventoryItem cream = getOrCreateInventoryItem(defaultOutlet, "Heavy Cream", "ING-005", l, new BigDecimal("5.00"), new BigDecimal("30.000"));
+        InventoryItem parmesan = getOrCreateInventoryItem(defaultOutlet, "Parmigiano Reggiano", "ING-006", kg, new BigDecimal("16.00"), new BigDecimal("20.000"));
+        InventoryItem coffeeBeans = getOrCreateInventoryItem(defaultOutlet, "Espresso Roast Beans", "ING-007", kg, new BigDecimal("18.00"), new BigDecimal("25.000"));
+        InventoryItem wholeMilk = getOrCreateInventoryItem(defaultOutlet, "Whole Milk", "ING-008", l, new BigDecimal("1.80"), new BigDecimal("80.000"));
+
+        // 8. Seed Modifier Groups
+        ModifierGroup sizeGroup = getOrCreateModifierGroup(defaultOutlet, "Size Selection", 1, 1);
+        getOrCreateModifier(sizeGroup, "Regular (10\")", BigDecimal.ZERO);
+        getOrCreateModifier(sizeGroup, "Large (14\")", new BigDecimal("4.00"));
+
+        ModifierGroup crustGroup = getOrCreateModifierGroup(defaultOutlet, "Crust Option", 1, 1);
+        getOrCreateModifier(crustGroup, "Classic Hand-Tossed", BigDecimal.ZERO);
+        getOrCreateModifier(crustGroup, "Thin & Crispy", BigDecimal.ZERO);
+        getOrCreateModifier(crustGroup, "Cheese Stuffed Crust", new BigDecimal("2.50"));
+
+        ModifierGroup addonsGroup = getOrCreateModifierGroup(defaultOutlet, "Extra Add-ons", 0, 5);
+        getOrCreateModifier(addonsGroup, "Extra Mozzarella", new BigDecimal("1.50"));
+        getOrCreateModifier(addonsGroup, "Truffle Oil Drizzle", new BigDecimal("2.00"));
+        getOrCreateModifier(addonsGroup, "Fresh Basil & Oregano", new BigDecimal("0.50"));
+
+        // 9. Seed Categories
+        MenuCategory startersCat = getOrCreateCategory(defaultOutlet, "Starters & Appetizers", "Crispy delights and shareable opening bites", 1);
+        MenuCategory pizzaCat = getOrCreateCategory(defaultOutlet, "Wood-Fired Pizzas", "Authentic Neapolitan sourdough pizzas baked at 900°F", 2);
+        MenuCategory pastaCat = getOrCreateCategory(defaultOutlet, "Artisan Pastas", "Handcrafted Italian pastas tossed in signature sauces", 3);
+        MenuCategory beverageCat = getOrCreateCategory(defaultOutlet, "Beverages & Coffee", "Handcrafted espresso, mocktails, and fresh coolers", 4);
+        MenuCategory dessertCat = getOrCreateCategory(defaultOutlet, "Artisan Desserts", "Sweet endings and decadent treats", 5);
+
+        // 10. Seed Menu Items
+        MenuItem margherita = getOrCreateMenuItem(pizzaCat, "Margherita D.O.P Pizza", "Crushed San Marzano tomatoes, fresh mozzarella, basil, EVOO", new BigDecimal("14.50"), new BigDecimal("3.25"), 15, Set.of(sizeGroup, crustGroup, addonsGroup));
+        MenuItem pepperoni = getOrCreateMenuItem(pizzaCat, "Spicy Pepperoni Pizza", "Smoked pepperoni slices, hot honey drizzle, mozzarella", new BigDecimal("16.50"), new BigDecimal("4.10"), 15, Set.of(sizeGroup, crustGroup, addonsGroup));
+        MenuItem alfredo = getOrCreateMenuItem(pastaCat, "Creamy Fettuccine Alfredo", "Rich garlic parmesan cream sauce, cracked pepper, parsley", new BigDecimal("13.00"), new BigDecimal("2.90"), 12, Set.of(addonsGroup));
+        MenuItem bruschetta = getOrCreateMenuItem(startersCat, "Classic Tomato Bruschetta", "Toasted sourdough, heirloom tomatoes, garlic, aged balsamic", new BigDecimal("8.50"), new BigDecimal("1.80"), 8, Set.of());
+        MenuItem cappuccino = getOrCreateMenuItem(beverageCat, "Artisan Cappuccino", "Double espresso shot with velvety micro-foam milk", new BigDecimal("4.50"), new BigDecimal("0.65"), 5, Set.of());
+        MenuItem tiramisu = getOrCreateMenuItem(dessertCat, "Traditional Tiramisu", "Savoiardi ladyfingers soaked in espresso with mascarpone", new BigDecimal("7.50"), new BigDecimal("1.95"), 5, Set.of());
+
+        // 11. Seed Recipe BOM for Margherita Pizza
+        createRecipeIfAbsent(margherita, "Stretch dough ball to 12 inches. Spread 80g tomato sauce evenly leaving 1 inch rim. Top with 150g fresh mozzarella. Bake in wood-fired oven at 850°F for 90 seconds. Garnish with fresh basil and EVOO.", List.of(
+                new RecipeItemInit(dough, new BigDecimal("1.000")),
+                new RecipeItemInit(tomatoSauce, new BigDecimal("0.080")),
+                new RecipeItemInit(mozzarella, new BigDecimal("0.150"))
+        ));
+
+        // Seed Recipe BOM for Fettuccine Alfredo
+        createRecipeIfAbsent(alfredo, "Boil pasta for 9 minutes until al dente. In a separate pan, warm cream and butter, whisk in freshly grated parmesan until silky. Toss pasta in sauce and season.", List.of(
+                new RecipeItemInit(pasta, new BigDecimal("0.200")),
+                new RecipeItemInit(cream, new BigDecimal("0.120")),
+                new RecipeItemInit(parmesan, new BigDecimal("0.060"))
+        ));
     }
 
     private void createTableIfAbsent(Floor floor, String tableNumber, int capacity, TableShape shape, int posX, int posY, TableStatus status) {
@@ -214,6 +294,77 @@ public class DataInitializer implements CommandLineRunner {
             user.setRoles(roles);
             user.setActive(active);
             userRepository.save(user);
+        }
+    }
+
+    private InventoryUnit getOrCreateUnit(String name, String symbol) {
+        return unitRepository.findBySymbolIgnoreCase(symbol).orElseGet(() ->
+                unitRepository.save(new InventoryUnit(UUID.randomUUID().toString(), name, symbol))
+        );
+    }
+
+    private InventoryItem getOrCreateInventoryItem(Outlet outlet, String name, String sku, InventoryUnit unit, BigDecimal unitCost, BigDecimal currentStock) {
+        return inventoryItemRepository.findByOutletIdAndSku(outlet.getId(), sku).orElseGet(() -> {
+            InventoryItem item = new InventoryItem(UUID.randomUUID().toString(), outlet, name, sku, unit, unitCost);
+            item.setCurrentStock(currentStock);
+            return inventoryItemRepository.save(item);
+        });
+    }
+
+    private ModifierGroup getOrCreateModifierGroup(Outlet outlet, String name, int minSel, int maxSel) {
+        return modifierGroupRepository.findByOutletIdOrderByCreatedAtAsc(outlet.getId()).stream()
+                .filter(mg -> mg.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseGet(() -> modifierGroupRepository.save(new ModifierGroup(UUID.randomUUID().toString(), outlet, name, minSel, maxSel)));
+    }
+
+    private void getOrCreateModifier(ModifierGroup group, String name, BigDecimal price) {
+        boolean exists = group.getModifiers().stream().anyMatch(m -> m.getName().equalsIgnoreCase(name));
+        if (!exists) {
+            Modifier mod = new Modifier(UUID.randomUUID().toString(), group, name, price);
+            group.getModifiers().add(mod);
+            modifierGroupRepository.save(group);
+        }
+    }
+
+    private MenuCategory getOrCreateCategory(Outlet outlet, String name, String description, int displayOrder) {
+        return categoryRepository.findByOutletIdOrderByDisplayOrderAsc(outlet.getId()).stream()
+                .filter(c -> c.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseGet(() -> categoryRepository.save(new MenuCategory(UUID.randomUUID().toString(), outlet, name, description, displayOrder)));
+    }
+
+    private MenuItem getOrCreateMenuItem(MenuCategory category, String name, String description, BigDecimal price, BigDecimal costPrice, int prepTime, Set<ModifierGroup> modGroups) {
+        return menuItemRepository.findByCategoryIdOrderByPriceAsc(category.getId()).stream()
+                .filter(m -> m.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseGet(() -> {
+                    MenuItem item = new MenuItem(UUID.randomUUID().toString(), category, name, price);
+                    item.setDescription(description);
+                    item.setCostPrice(costPrice);
+                    item.setPrepTimeMinutes(prepTime);
+                    item.setModifierGroups(new HashSet<>(modGroups));
+                    return menuItemRepository.save(item);
+                });
+    }
+
+    private static class RecipeItemInit {
+        InventoryItem item;
+        BigDecimal quantity;
+        RecipeItemInit(InventoryItem item, BigDecimal quantity) {
+            this.item = item;
+            this.quantity = quantity;
+        }
+    }
+
+    private void createRecipeIfAbsent(MenuItem menuItem, String instructions, List<RecipeItemInit> ingredients) {
+        if (!recipeRepository.existsByMenuItemId(menuItem.getId())) {
+            Recipe recipe = new Recipe(UUID.randomUUID().toString(), menuItem, instructions);
+            for (RecipeItemInit ing : ingredients) {
+                RecipeItem rItem = new RecipeItem(UUID.randomUUID().toString(), recipe, ing.item, ing.quantity);
+                recipe.getRecipeItems().add(rItem);
+            }
+            recipeRepository.save(recipe);
         }
     }
 }

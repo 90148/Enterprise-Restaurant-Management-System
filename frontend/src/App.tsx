@@ -12,6 +12,8 @@ import RoleListPage from '@/pages/roles/RoleListPage';
 import PermissionMatrixPage from '@/pages/roles/PermissionMatrixPage';
 import OutletListPage from '@/pages/outlets/OutletListPage';
 import FloorTableManagementPage from '@/pages/tables/FloorTableManagementPage';
+import MenuItemListPage from '@/pages/menu/MenuItemListPage';
+import RecipeListPage from '@/pages/menu/RecipeListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +90,24 @@ export const App: React.FC = () => {
                 element={
                   <RoleBasedRoute requiredPermission="OUTLET_VIEW">
                     <FloorTableManagementPage />
+                  </RoleBasedRoute>
+                }
+              />
+
+              {/* Menu & Recipe Management */}
+              <Route
+                path="menu/items"
+                element={
+                  <RoleBasedRoute requiredPermission="MENU_VIEW">
+                    <MenuItemListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="recipes"
+                element={
+                  <RoleBasedRoute requiredPermission="MENU_VIEW">
+                    <RecipeListPage />
                   </RoleBasedRoute>
                 }
               />
