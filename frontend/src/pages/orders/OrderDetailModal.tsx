@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrderById, updateOrderStatus, cancelOrder } from '@/api/order';
+import { generateBill } from '@/api/billing';
 import { Order, OrderStatus } from '@/types/order';
+import { Bill } from '@/types/billing';
+import { PaymentModal } from '@/pages/billing/PaymentModal';
+import { ReceiptModal } from '@/pages/billing/ReceiptModal';
 import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 import {
@@ -14,6 +18,7 @@ import {
   AlertTriangle,
   FileText,
   PlusCircle,
+  Receipt,
 } from 'lucide-react';
 
 interface OrderDetailModalProps {
@@ -36,6 +41,23 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   const [cancelPrompt, setCancelPrompt] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [billingModalBill, setBillingModalBill] = useState<Bill | null>(null);
+  const [receiptModalBill, setReceiptModalBill] = useState<Bill | null>(null);
+
+  const handleGenerateBillAndSettle = async () => {
+    if (!orderId) return;
+    try {
+      setIsUpdating(true);
+      setError(null);
+      const bill = await generateBill(orderId);
+      setBillingModalBill(bill);
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } } };
+      setError(errorObj?.response?.data?.message || 'Failed to generate bill');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   useEffect(() => {
     if (orderId && isOpen) {
@@ -356,12 +378,45 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 </Button>
               )}
 
+              {order.status !== 'COMPLETED' && order.status !== 'CANCELLED' && (
+                <Button
+                  variant="primary"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white"
+                  onClick={handleGenerateBillAndSettle}
+                  disabled={isUpdating}
+                >
+                  <Receipt className="w-4 h-4 mr-1.5" /> Bill &amp; Settle
+                </Button>
+              )}
+
               <Button variant="secondary" onClick={onClose}>
                 Close
               </Button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Payment Processing Modal */}
+      {billingModalBill && (
+        <PaymentModal
+          bill={billingModalBill}
+          onClose={() => setBillingModalBill(null)}
+          onPaymentSuccess={(updated) => {
+            setBillingModalBill(null);
+            setReceiptModalBill(updated);
+            loadOrder();
+            onOrderUpdated();
+          }}
+        />
+      )}
+
+      {/* Customer Receipt Modal */}
+      {receiptModalBill && (
+        <ReceiptModal
+          bill={receiptModalBill}
+          onClose={() => setReceiptModalBill(null)}
+        />
       )}
     </Modal>
   );
