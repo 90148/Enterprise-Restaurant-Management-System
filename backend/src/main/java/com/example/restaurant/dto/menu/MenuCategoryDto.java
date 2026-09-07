@@ -11,6 +11,7 @@ public class MenuCategoryDto {
     private Integer displayOrder;
     private boolean active;
     private long itemCount;
+    private String kitchenStation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -18,6 +19,10 @@ public class MenuCategoryDto {
     }
 
     public MenuCategoryDto(String id, String outletId, String name, String description, Integer displayOrder, boolean active, long itemCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this(id, outletId, name, description, displayOrder, active, itemCount, "MAIN_KITCHEN", createdAt, updatedAt);
+    }
+
+    public MenuCategoryDto(String id, String outletId, String name, String description, Integer displayOrder, boolean active, long itemCount, String kitchenStation, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.outletId = outletId;
         this.name = name;
@@ -25,6 +30,7 @@ public class MenuCategoryDto {
         this.displayOrder = displayOrder;
         this.active = active;
         this.itemCount = itemCount;
+        this.kitchenStation = kitchenStation;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -99,5 +105,13 @@ public class MenuCategoryDto {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getKitchenStation() {
+        return kitchenStation;
+    }
+
+    public void setKitchenStation(String kitchenStation) {
+        this.kitchenStation = kitchenStation;
     }
 }

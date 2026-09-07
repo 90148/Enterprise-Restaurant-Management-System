@@ -18,6 +18,8 @@ public class CreateCategoryRequest {
 
     private Boolean active = true;
 
+    private String kitchenStation = "MAIN_KITCHEN";
+
     public CreateCategoryRequest() {
     }
 
@@ -27,6 +29,16 @@ public class CreateCategoryRequest {
         this.description = description;
         this.displayOrder = displayOrder != null ? displayOrder : 0;
         this.active = active != null ? active : true;
+        this.kitchenStation = "MAIN_KITCHEN";
+    }
+
+    public CreateCategoryRequest(String outletId, String name, String description, Integer displayOrder, Boolean active, String kitchenStation) {
+        this.outletId = outletId;
+        this.name = name;
+        this.description = description;
+        this.displayOrder = displayOrder != null ? displayOrder : 0;
+        this.active = active != null ? active : true;
+        this.kitchenStation = kitchenStation != null ? kitchenStation : "MAIN_KITCHEN";
     }
 
     public String getOutletId() {
@@ -67,5 +79,13 @@ public class CreateCategoryRequest {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getKitchenStation() {
+        return kitchenStation;
+    }
+
+    public void setKitchenStation(String kitchenStation) {
+        this.kitchenStation = kitchenStation;
     }
 }

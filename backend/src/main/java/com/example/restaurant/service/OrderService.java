@@ -30,6 +30,8 @@ public class OrderService {
     private final MenuItemRepository menuItemRepository;
     private final ModifierRepository modifierRepository;
     private final UserRepository userRepository;
+    private final KotService kotService;
+    private final KotRepository kotRepository;
 
     private static final List<OrderStatus> TERMINAL_STATUSES = List.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED);
 
@@ -40,7 +42,9 @@ public class OrderService {
                         RestaurantTableRepository restaurantTableRepository,
                         MenuItemRepository menuItemRepository,
                         ModifierRepository modifierRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        KotService kotService,
+                        KotRepository kotRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.orderItemModifierRepository = orderItemModifierRepository;
@@ -49,6 +53,8 @@ public class OrderService {
         this.menuItemRepository = menuItemRepository;
         this.modifierRepository = modifierRepository;
         this.userRepository = userRepository;
+        this.kotService = kotService;
+        this.kotRepository = kotRepository;
     }
 
     @Transactional
@@ -103,9 +109,13 @@ public class OrderService {
         order.setStatus(OrderStatus.NEW);
 
         // Process line items
-        processOrderItems(order, request.getItems());
+        List<OrderItem> createdItems = processOrderItems(order, request.getItems());
 
         Order saved = orderRepository.save(order);
+
+        // Auto-generate KOT for Kitchen Display System (Round 1)
+        kotService.createKotForOrder(saved, createdItems, 1);
+
         return mapToOrderDto(saved);
     }
 
@@ -119,9 +129,14 @@ public class OrderService {
         }
 
         // Process new items and append to existing order
-        processOrderItems(order, request.getItems());
+        List<OrderItem> createdItems = processOrderItems(order, request.getItems());
 
         Order saved = orderRepository.save(order);
+
+        // Auto-generate subsequent round KOT
+        int roundNumber = kotRepository.findByOrderId(order.getId()).size() + 1;
+        kotService.createKotForOrder(saved, createdItems, roundNumber);
+
         return mapToOrderDto(saved);
     }
 
@@ -145,6 +160,17 @@ public class OrderService {
         if (request.getReason() != null && !request.getReason().isBlank()) {
             String currentNotes = order.getNotes() != null ? order.getNotes() + " | " : "";
             order.setNotes(currentNotes + "Status change (" + newStatus + "): " + request.getReason());
+        }
+
+        // If order was cancelled, also cancel active KOTs
+        if (newStatus == OrderStatus.CANCELLED) {
+            List<Kot> activeKots = kotRepository.findByOrderId(order.getId());
+            for (Kot k : activeKots) {
+                if (k.getStatus() != KotStatus.SERVED && k.getStatus() != KotStatus.CANCELLED) {
+                    k.setStatus(KotStatus.CANCELLED);
+                    kotRepository.save(k);
+                }
+            }
         }
 
         // If order was cancelled or completed and was DINE_IN, check if table should be released
@@ -235,9 +261,10 @@ public class OrderService {
         return new OrderStatsDto(total, active, completed, cancelled);
     }
 
-    private void processOrderItems(Order order, List<CreateOrderItemRequest> itemRequests) {
+    private List<OrderItem> processOrderItems(Order order, List<CreateOrderItemRequest> itemRequests) {
         BigDecimal totalSubtotal = order.getSubtotal() != null ? order.getSubtotal() : BigDecimal.ZERO;
         BigDecimal totalTax = order.getTaxAmount() != null ? order.getTaxAmount() : BigDecimal.ZERO;
+        List<OrderItem> createdItems = new ArrayList<>();
 
         for (CreateOrderItemRequest itemReq : itemRequests) {
             MenuItem menuItem = menuItemRepository.findById(itemReq.getMenuItemId())
@@ -301,6 +328,7 @@ public class OrderService {
             }
 
             order.addItem(orderItem);
+            createdItems.add(orderItem);
             totalSubtotal = totalSubtotal.add(lineSubtotal);
             totalTax = totalTax.add(lineTax);
         }
@@ -309,6 +337,7 @@ public class OrderService {
         order.setTaxAmount(totalTax);
         BigDecimal discount = order.getDiscountAmount() != null ? order.getDiscountAmount() : BigDecimal.ZERO;
         order.setTotalAmount(totalSubtotal.add(totalTax).subtract(discount));
+        return createdItems;
     }
 
     private String generateOrderNumber(String outletId) {

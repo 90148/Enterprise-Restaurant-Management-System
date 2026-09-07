@@ -16,6 +16,7 @@ import MenuItemListPage from '@/pages/menu/MenuItemListPage';
 import RecipeListPage from '@/pages/menu/RecipeListPage';
 import { PosPage } from '@/pages/pos/PosPage';
 import { OrderListPage } from '@/pages/orders/OrderListPage';
+import { KitchenDisplayPage } from '@/pages/kitchen/KitchenDisplayPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,6 +129,14 @@ export const App: React.FC = () => {
                 element={
                   <RoleBasedRoute requiredPermission="ORDER_VIEW">
                     <OrderListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="kitchen"
+                element={
+                  <RoleBasedRoute requiredPermission="KITCHEN_VIEW">
+                    <KitchenDisplayPage />
                   </RoleBasedRoute>
                 }
               />

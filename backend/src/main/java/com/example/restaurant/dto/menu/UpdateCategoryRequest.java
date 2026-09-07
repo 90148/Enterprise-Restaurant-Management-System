@@ -15,6 +15,8 @@ public class UpdateCategoryRequest {
 
     private Boolean active;
 
+    private String kitchenStation;
+
     public UpdateCategoryRequest() {
     }
 
@@ -23,6 +25,14 @@ public class UpdateCategoryRequest {
         this.description = description;
         this.displayOrder = displayOrder;
         this.active = active;
+    }
+
+    public UpdateCategoryRequest(String name, String description, Integer displayOrder, Boolean active, String kitchenStation) {
+        this.name = name;
+        this.description = description;
+        this.displayOrder = displayOrder;
+        this.active = active;
+        this.kitchenStation = kitchenStation;
     }
 
     public String getName() {
@@ -55,5 +65,13 @@ public class UpdateCategoryRequest {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getKitchenStation() {
+        return kitchenStation;
+    }
+
+    public void setKitchenStation(String kitchenStation) {
+        this.kitchenStation = kitchenStation;
     }
 }

@@ -69,6 +69,9 @@ public class MenuCategoryService {
         if (request.getActive() != null) {
             cat.setActive(request.getActive());
         }
+        if (request.getKitchenStation() != null && !request.getKitchenStation().isBlank()) {
+            cat.setKitchenStation(request.getKitchenStation().toUpperCase());
+        }
 
         MenuCategory saved = categoryRepository.save(cat);
         return mapToDto(saved);
@@ -91,6 +94,9 @@ public class MenuCategoryService {
         }
         if (request.getActive() != null) {
             cat.setActive(request.getActive());
+        }
+        if (request.getKitchenStation() != null && !request.getKitchenStation().isBlank()) {
+            cat.setKitchenStation(request.getKitchenStation().toUpperCase());
         }
 
         MenuCategory saved = categoryRepository.save(cat);
@@ -121,6 +127,7 @@ public class MenuCategoryService {
                 cat.getDisplayOrder(),
                 cat.isActive(),
                 count,
+                cat.getKitchenStation(),
                 cat.getCreatedAt(),
                 cat.getUpdatedAt()
         );

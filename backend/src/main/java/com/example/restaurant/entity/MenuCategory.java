@@ -24,6 +24,9 @@ public class MenuCategory {
     @Column(name = "display_order", nullable = false)
     private Integer displayOrder = 0;
 
+    @Column(name = "kitchen_station", length = 50)
+    private String kitchenStation = "MAIN_KITCHEN";
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -94,6 +97,14 @@ public class MenuCategory {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public String getKitchenStation() {
+        return kitchenStation != null ? kitchenStation : "MAIN_KITCHEN";
+    }
+
+    public void setKitchenStation(String kitchenStation) {
+        this.kitchenStation = kitchenStation;
     }
 
     public boolean isActive() {
