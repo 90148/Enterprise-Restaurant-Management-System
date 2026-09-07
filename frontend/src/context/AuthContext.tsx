@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, LoginCredentials, AuthResponse } from '@/types/auth';
+import type { ApiResponse } from '@/types/api';
 import apiClient from '@/api/client';
+import tokenService from '@/services/tokenService';
 
 interface AuthContextType {
   user: User | null;
@@ -17,59 +19,82 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(tokenService.getUser());
   const [activeOutletId, setActiveOutletId] = useState<string | null>(
-    localStorage.getItem('active_outlet_id')
+    tokenService.getActiveOutletId()
   );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Restore session from localStorage if present
-    const storedUser = localStorage.getItem('auth_user');
-    const token = localStorage.getItem('access_token');
+    const initializeAuth = async () => {
+      const token = tokenService.getAccessToken();
+      const storedUser = tokenService.getUser();
 
-    if (storedUser && token) {
-      try {
-        const parsedUser: User = JSON.parse(storedUser);
-        setUser(parsedUser);
-        if (parsedUser.outletId && !activeOutletId) {
-          setActiveOutletId(parsedUser.outletId);
-          localStorage.setItem('active_outlet_id', parsedUser.outletId);
+      if (token && storedUser) {
+        if (tokenService.isTokenExpired(token)) {
+          // Token expired, attempt silent refresh
+          const refreshToken = tokenService.getRefreshToken();
+          if (refreshToken) {
+            try {
+              const res = await apiClient.post<ApiResponse<AuthResponse>>('/auth/refresh', {
+                refreshToken,
+              });
+              const authData = res.data.data;
+              tokenService.setAccessToken(authData.accessToken);
+              tokenService.setRefreshToken(authData.refreshToken);
+              tokenService.setUser(authData.user);
+              setUser(authData.user);
+            } catch {
+              tokenService.clearSession();
+              setUser(null);
+            }
+          } else {
+            tokenService.clearSession();
+            setUser(null);
+          }
+        } else {
+          setUser(storedUser);
+          if (storedUser.outletId && !activeOutletId) {
+            setActiveOutletId(storedUser.outletId);
+            tokenService.setActiveOutletId(storedUser.outletId);
+          }
         }
-      } catch {
-        localStorage.removeItem('auth_user');
-        localStorage.removeItem('access_token');
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
-    const response = await apiClient.post<{ data: AuthResponse }>('/auth/login', credentials);
+    const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
     const authData = response.data.data;
-    
-    localStorage.setItem('access_token', authData.accessToken);
-    localStorage.setItem('refresh_token', authData.refreshToken);
-    localStorage.setItem('auth_user', JSON.stringify(authData.user));
+
+    tokenService.setAccessToken(authData.accessToken);
+    tokenService.setRefreshToken(authData.refreshToken);
+    tokenService.setUser(authData.user);
 
     setUser(authData.user);
     if (authData.user.outletId) {
       setActiveOutletId(authData.user.outletId);
-      localStorage.setItem('active_outlet_id', authData.user.outletId);
+      tokenService.setActiveOutletId(authData.user.outletId);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('auth_user');
+    const refreshToken = tokenService.getRefreshToken();
+    if (refreshToken) {
+      // Best effort backend revocation
+      apiClient.post('/auth/logout', { refreshToken }).catch(() => {});
+    }
+    tokenService.clearSession();
     setUser(null);
     window.location.href = '/login';
   };
 
   const setActiveOutlet = (outletId: string) => {
     setActiveOutletId(outletId);
-    localStorage.setItem('active_outlet_id', outletId);
+    tokenService.setActiveOutletId(outletId);
   };
 
   const hasPermission = (permission: string): boolean => {
