@@ -1,13 +1,7 @@
 package com.example.restaurant.config;
 
-import com.example.restaurant.entity.Outlet;
-import com.example.restaurant.entity.Permission;
-import com.example.restaurant.entity.Role;
-import com.example.restaurant.entity.User;
-import com.example.restaurant.repository.OutletRepository;
-import com.example.restaurant.repository.PermissionRepository;
-import com.example.restaurant.repository.RoleRepository;
-import com.example.restaurant.repository.UserRepository;
+import com.example.restaurant.entity.*;
+import com.example.restaurant.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -23,18 +17,24 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FloorRepository floorRepository;
+    private final RestaurantTableRepository tableRepository;
 
     public DataInitializer(
             OutletRepository outletRepository,
             PermissionRepository permissionRepository,
             RoleRepository roleRepository,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            FloorRepository floorRepository,
+            RestaurantTableRepository tableRepository) {
         this.outletRepository = outletRepository;
         this.permissionRepository = permissionRepository;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.floorRepository = floorRepository;
+        this.tableRepository = tableRepository;
     }
 
     @Override
@@ -130,6 +130,55 @@ public class DataInitializer implements CommandLineRunner {
         createUserIfAbsent("kitchen", "kitchen@restomaster.io", "Kitchen@123", "Chef Mario", "+1-555-0104", defaultOutlet, Set.of(kitchenRole), true);
         createUserIfAbsent("inventory", "inventory@restomaster.io", "Inventory@123", "Dave Inventory", "+1-555-0105", defaultOutlet, Set.of(inventoryRole), true);
         createUserIfAbsent("inactive_user", "inactive@restomaster.io", "Inactive@123", "Deactivated Staff", "+1-555-0199", defaultOutlet, Set.of(cashierRole), false);
+
+        // 5. Seed Floors and Tables for Default Outlet
+        Floor groundFloor = floorRepository.findByOutletIdOrderByFloorNumberAsc(defaultOutlet.getId())
+                .stream()
+                .filter(f -> f.getFloorNumber() == 1)
+                .findFirst()
+                .orElseGet(() -> {
+                    Floor floor = new Floor(UUID.randomUUID().toString(), defaultOutlet, "Ground Floor - Main Dining", 1);
+                    return floorRepository.save(floor);
+                });
+
+        Floor terraceFloor = floorRepository.findByOutletIdOrderByFloorNumberAsc(defaultOutlet.getId())
+                .stream()
+                .filter(f -> f.getFloorNumber() == 2)
+                .findFirst()
+                .orElseGet(() -> {
+                    Floor floor = new Floor(UUID.randomUUID().toString(), defaultOutlet, "First Floor - Terrace Lounge", 2);
+                    return floorRepository.save(floor);
+                });
+
+        // Seed Ground Floor Tables
+        createTableIfAbsent(groundFloor, "T-01", 2, TableShape.SQUARE, 60, 60, TableStatus.AVAILABLE);
+        createTableIfAbsent(groundFloor, "T-02", 4, TableShape.SQUARE, 220, 60, TableStatus.OCCUPIED);
+        createTableIfAbsent(groundFloor, "T-03", 4, TableShape.SQUARE, 380, 60, TableStatus.AVAILABLE);
+        createTableIfAbsent(groundFloor, "T-04", 6, TableShape.RECTANGLE, 60, 220, TableStatus.RESERVED);
+        createTableIfAbsent(groundFloor, "T-05", 8, TableShape.RECTANGLE, 260, 220, TableStatus.BILLING);
+        createTableIfAbsent(groundFloor, "T-06", 2, TableShape.ROUND, 480, 220, TableStatus.AVAILABLE);
+
+        // Seed Terrace Lounge Tables
+        createTableIfAbsent(terraceFloor, "TR-01", 4, TableShape.ROUND, 80, 60, TableStatus.AVAILABLE);
+        createTableIfAbsent(terraceFloor, "TR-02", 4, TableShape.ROUND, 240, 60, TableStatus.AVAILABLE);
+        createTableIfAbsent(terraceFloor, "TR-03", 6, TableShape.RECTANGLE, 400, 60, TableStatus.OCCUPIED);
+        createTableIfAbsent(terraceFloor, "TR-04", 2, TableShape.SQUARE, 80, 220, TableStatus.RESERVED);
+    }
+
+    private void createTableIfAbsent(Floor floor, String tableNumber, int capacity, TableShape shape, int posX, int posY, TableStatus status) {
+        if (!tableRepository.existsByFloorIdAndTableNumberIgnoreCase(floor.getId(), tableNumber)) {
+            RestaurantTable table = new RestaurantTable(
+                    UUID.randomUUID().toString(),
+                    floor,
+                    tableNumber,
+                    capacity,
+                    shape,
+                    posX,
+                    posY
+            );
+            table.setStatus(status);
+            tableRepository.save(table);
+        }
     }
 
     private Role getOrCreateRole(String name, String description, Set<Permission> permissions) {
