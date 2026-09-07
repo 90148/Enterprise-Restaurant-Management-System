@@ -14,6 +14,8 @@ import OutletListPage from '@/pages/outlets/OutletListPage';
 import FloorTableManagementPage from '@/pages/tables/FloorTableManagementPage';
 import MenuItemListPage from '@/pages/menu/MenuItemListPage';
 import RecipeListPage from '@/pages/menu/RecipeListPage';
+import { PosPage } from '@/pages/pos/PosPage';
+import { OrderListPage } from '@/pages/orders/OrderListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -108,6 +110,24 @@ export const App: React.FC = () => {
                 element={
                   <RoleBasedRoute requiredPermission="MENU_VIEW">
                     <RecipeListPage />
+                  </RoleBasedRoute>
+                }
+              />
+
+              {/* POS & Order Management */}
+              <Route
+                path="pos"
+                element={
+                  <RoleBasedRoute requiredPermission="ORDER_CREATE">
+                    <PosPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="orders"
+                element={
+                  <RoleBasedRoute requiredPermission="ORDER_VIEW">
+                    <OrderListPage />
                   </RoleBasedRoute>
                 }
               />

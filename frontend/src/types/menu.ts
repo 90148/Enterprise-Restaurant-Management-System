@@ -39,6 +39,7 @@ export interface ModifierGroup {
   name: string;
   minSelection: number;
   maxSelection: number;
+  isRequired?: boolean;
   active: boolean;
   modifiers: Modifier[];
 }
@@ -68,6 +69,7 @@ export interface MenuItem {
   taxRate: number;
   imageUrl?: string;
   isAvailable: boolean;
+  isVeg?: boolean;
   prepTimeMinutes: number;
   specialInstructions?: string;
   active: boolean;

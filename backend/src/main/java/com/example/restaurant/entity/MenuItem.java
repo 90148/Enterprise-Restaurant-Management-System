@@ -45,6 +45,9 @@ public class MenuItem {
     @Column(name = "special_instructions", columnDefinition = "TEXT")
     private String specialInstructions;
 
+    @Column(name = "is_veg")
+    private Boolean isVeg = true;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -171,6 +174,14 @@ public class MenuItem {
 
     public void setSpecialInstructions(String specialInstructions) {
         this.specialInstructions = specialInstructions;
+    }
+
+    public Boolean getIsVeg() {
+        return isVeg != null ? isVeg : true;
+    }
+
+    public void setIsVeg(Boolean isVeg) {
+        this.isVeg = isVeg;
     }
 
     public boolean isActive() {

@@ -115,6 +115,7 @@ public class DataInitializer implements CommandLineRunner {
         cashierPerms.add(permMap.get("ORDER_VIEW"));
         cashierPerms.add(permMap.get("ORDER_CREATE"));
         cashierPerms.add(permMap.get("ORDER_UPDATE"));
+        cashierPerms.add(permMap.get("ORDER_CANCEL"));
         cashierPerms.add(permMap.get("BILL_VIEW"));
         cashierPerms.add(permMap.get("BILL_CREATE"));
         cashierPerms.add(permMap.get("PAYMENT_CREATE"));
@@ -125,6 +126,7 @@ public class DataInitializer implements CommandLineRunner {
         Set<Permission> waiterPerms = new HashSet<>();
         waiterPerms.add(permMap.get("ORDER_VIEW"));
         waiterPerms.add(permMap.get("ORDER_CREATE"));
+        waiterPerms.add(permMap.get("ORDER_UPDATE"));
         waiterPerms.add(permMap.get("MENU_VIEW"));
         waiterPerms.add(permMap.get("OUTLET_VIEW"));
         Role waiterRole = getOrCreateRole("WAITER", "Waitstaff for dining table management", waiterPerms);

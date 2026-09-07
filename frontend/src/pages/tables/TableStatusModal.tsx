@@ -1,8 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import type { RestaurantTable, TableStatus } from '@/types/table';
-import { CheckCircle2, Utensils, Calendar, Receipt } from 'lucide-react';
+import { CheckCircle2, Utensils, Calendar, Receipt, ShoppingBag } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface TableStatusModalProps {
@@ -20,6 +21,7 @@ export const TableStatusModal: React.FC<TableStatusModalProps> = ({
   onUpdateStatus,
   isLoading = false,
 }) => {
+  const navigate = useNavigate();
   if (!table) return null;
 
   const statuses: {
@@ -122,8 +124,21 @@ export const TableStatusModal: React.FC<TableStatusModalProps> = ({
           })}
         </div>
 
-        <div className="flex justify-end pt-2">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              onClose();
+              navigate(`/pos?tableId=${table.id}`);
+            }}
+            className="flex items-center gap-1.5"
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>Open in POS</span>
+          </Button>
+
+          <Button variant="outline" size="sm" onClick={onClose} disabled={isLoading}>
             Close
           </Button>
         </div>
