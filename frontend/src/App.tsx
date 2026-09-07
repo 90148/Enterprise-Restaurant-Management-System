@@ -3,9 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/context/AuthContext';
 import ProtectedRoute from '@/routes/ProtectedRoute';
+import RoleBasedRoute from '@/routes/RoleBasedRoute';
 import AppLayout from '@/layouts/AppLayout';
 import LoginPage from '@/pages/auth/LoginPage';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
+import UserListPage from '@/pages/users/UserListPage';
+import RoleListPage from '@/pages/roles/RoleListPage';
+import PermissionMatrixPage from '@/pages/roles/PermissionMatrixPage';
+import OutletListPage from '@/pages/outlets/OutletListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +42,46 @@ export const App: React.FC = () => {
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />
-              {/* Fallback inside dashboard */}
+
+              {/* User Management */}
+              <Route
+                path="users"
+                element={
+                  <RoleBasedRoute requiredPermission="USER_VIEW">
+                    <UserListPage />
+                  </RoleBasedRoute>
+                }
+              />
+
+              {/* Role & Permission Management */}
+              <Route
+                path="roles"
+                element={
+                  <RoleBasedRoute requiredPermission="ROLE_VIEW">
+                    <RoleListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="permissions"
+                element={
+                  <RoleBasedRoute requiredPermission="ROLE_VIEW">
+                    <PermissionMatrixPage />
+                  </RoleBasedRoute>
+                }
+              />
+
+              {/* Outlet Management */}
+              <Route
+                path="outlets"
+                element={
+                  <RoleBasedRoute requiredPermission="OUTLET_VIEW">
+                    <OutletListPage />
+                  </RoleBasedRoute>
+                }
+              />
+
+              {/* Fallback */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Route>
 
