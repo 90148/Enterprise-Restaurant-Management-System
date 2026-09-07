@@ -96,7 +96,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Footer Info */}
       <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between">
-        <span>v1.0.0 (Phase 1)</span>
+        <span>v1.0.0 (Phase 10)</span>
         <span className="text-emerald-400">Online</span>
       </div>
     </aside>

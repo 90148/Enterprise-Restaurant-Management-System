@@ -20,6 +20,16 @@ export interface InventoryItem {
   updatedAt: string;
 }
 
+export interface InventoryItemSummary {
+  id: string;
+  name: string;
+  sku: string;
+  unitName?: string;
+  unitSymbol?: string;
+  currentStock: number;
+  unitCost: number;
+}
+
 export interface InventoryTransaction {
   id: string;
   inventoryItemId: string;

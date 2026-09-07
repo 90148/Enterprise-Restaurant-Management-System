@@ -1,16 +1,104 @@
 import React from 'react';
-import { DollarSign, Clock, CheckCircle2, Grid, AlertTriangle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import {
+  DollarSign,
+  Clock,
+  CheckCircle2,
+  Grid,
+  AlertTriangle,
+  ShoppingBag,
+  ChefHat,
+  Receipt,
+  Radio,
+  RefreshCw,
+  ArrowRight,
+} from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import StatCard from '@/components/common/StatCard';
 import Card from '@/components/common/Card';
+import Button from '@/components/common/Button';
+import { getDashboardStats } from '@/api/report';
+import { formatCurrency } from '@/utils/format';
+import { useAuth } from '@/context/AuthContext';
+import { useWebSocketSync } from '@/hooks/useWebSocketSync';
 
 export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, activeOutletId } = useAuth();
+  const outletId = activeOutletId || user?.outletId || undefined;
+  const outletName = user?.outletName || 'Primary Outlet';
+  const { isConnected } = useWebSocketSync();
+
+  const {
+    data: stats,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ['dashboard-stats', outletId],
+    queryFn: () => getDashboardStats(outletId),
+    refetchInterval: 15000,
+  });
+
+  const chartData = stats?.hourlyTrend.map((h) => ({
+    hour: h.label,
+    revenue: Number(h.revenue) || 0,
+    orders: h.orderCount || 0,
+  })) || [];
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Dashboard Overview</h2>
-          <p className="text-xs text-slate-500 mt-1">Live metrics and operations for current outlet</p>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-slate-900">Dashboard Overview</h2>
+            <div
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                isConnected
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'bg-amber-50 text-amber-700 border border-amber-200'
+              }`}
+            >
+              <Radio className={`w-3 h-3 ${isConnected ? 'animate-pulse text-emerald-500' : 'text-amber-500'}`} />
+              <span>{isConnected ? 'Live Sync Active' : 'Connecting Sync...'}</span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Real-time operations for <span className="font-semibold text-slate-700">{outletName}</span>
+          </p>
+        </div>
+
+        {/* Quick Action Shortcuts */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => refetch()}
+            isLoading={isRefetching}
+            className="flex items-center gap-1.5"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Refresh</span>
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => navigate('/pos')}
+            className="flex items-center gap-1.5 shadow-sm"
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>Open POS</span>
+          </Button>
         </div>
       </div>
 
@@ -18,65 +106,221 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Today's Revenue"
-          value="$2,450.00"
+          value={isLoading ? '...' : formatCurrency(stats?.todayRevenue || 0)}
           icon={<DollarSign className="w-5 h-5" />}
-          trend={{ value: 12.5, isPositive: true }}
+          trend={
+            stats && stats.yesterdayRevenue > 0
+              ? {
+                  value: Math.abs(stats.revenueTrendPercent),
+                  isPositive: stats.revenueTrendPercent >= 0,
+                }
+              : undefined
+          }
           description="vs. yesterday"
           color="emerald"
         />
         <StatCard
           title="Active Tables"
-          value="8 / 20"
+          value={isLoading ? '...' : `${stats?.activeTables || 0} / ${stats?.totalTables || 0}`}
           icon={<Grid className="w-5 h-5" />}
-          description="12 tables available"
+          description={`${stats?.availableTables || 0} tables available`}
           color="blue"
         />
         <StatCard
           title="Live Orders"
-          value="5"
+          value={isLoading ? '...' : stats?.liveOrders ?? 0}
           icon={<Clock className="w-5 h-5" />}
-          description="In kitchen / preparation"
+          description="In kitchen queue / prep"
           color="amber"
         />
         <StatCard
           title="Completed Orders"
-          value="42"
+          value={isLoading ? '...' : stats?.todayCompletedOrders ?? 0}
           icon={<CheckCircle2 className="w-5 h-5" />}
-          trend={{ value: 8.4, isPositive: true }}
-          description="Today's orders served"
+          description="Orders served today"
           color="purple"
         />
       </div>
 
-      {/* Operational Highlights */}
+      {/* Operational Highlights Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Hourly Sales & Traffic Trend */}
         <div className="lg:col-span-2">
-          <Card title="Sales & Order Trends" subtitle="Hourly breakdown of today's transactions">
-            <div className="h-64 flex items-center justify-center text-slate-400 text-sm border border-dashed border-slate-200 rounded-lg">
-              Sales trend chart will populate with live backend transactions.
+          <Card
+            title="Today's Hourly Revenue Trend"
+            subtitle="Real-time transaction volume and revenue curve across operating hours"
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/reports/sales')}
+                className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1"
+              >
+                <span>Full Reports</span>
+                <ArrowRight className="w-3 h-3" />
+              </Button>
+            }
+          >
+            <div className="h-72 w-full pt-2">
+              {isLoading ? (
+                <div className="h-full flex items-center justify-center text-slate-400 text-xs">
+                  Loading revenue curve...
+                </div>
+              ) : chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                    <XAxis dataKey="hour" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <Tooltip
+                      formatter={(val: any) => [formatCurrency(Number(val) || 0), 'Revenue']}
+                      labelFormatter={(label) => `Time: ${label}`}
+                      contentStyle={{
+                        backgroundColor: '#0f172a',
+                        borderRadius: '0.5rem',
+                        color: '#fff',
+                        fontSize: '12px',
+                        border: 'none',
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#10b981"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill="url(#revenueGrad)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-400 text-xs">
+                  No sales recorded yet today
+                </div>
+              )}
             </div>
           </Card>
         </div>
 
+        {/* Right 1 Col: Low Stock Alerts */}
         <div>
-          <Card title="Inventory Alerts" subtitle="Low stock and re-order thresholds">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-600" />
-                  <span className="font-semibold text-amber-900">Basmati Rice</span>
-                </div>
-                <span className="text-amber-700 font-medium">4.5 kg remaining</span>
+          <Card
+            title="Inventory Watchlist"
+            subtitle="Low stock and re-order thresholds"
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/inventory')}
+                className="text-xs text-amber-700 hover:text-amber-800 font-semibold"
+              >
+                Manage
+              </Button>
+            }
+          >
+            {isLoading ? (
+              <div className="py-8 text-center text-slate-400 text-xs">Checking stock thresholds...</div>
+            ) : !stats?.lowStockAlerts || stats.lowStockAlerts.length === 0 ? (
+              <div className="py-8 text-center text-slate-400 text-xs space-y-1">
+                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto opacity-75" />
+                <p className="font-semibold text-slate-700">All Ingredients Stocked</p>
+                <p className="text-slate-400">No items below minimum re-order thresholds.</p>
               </div>
-              <div className="flex items-center justify-between p-3 bg-rose-50 rounded-lg border border-rose-200 text-xs">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-rose-600" />
-                  <span className="font-semibold text-rose-900">Fresh Cream</span>
-                </div>
-                <span className="text-rose-700 font-medium">0.8 L remaining</span>
+            ) : (
+              <div className="space-y-3">
+                {stats.lowStockAlerts.slice(0, 5).map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-3 bg-amber-50/70 rounded-lg border border-amber-200/80 text-xs hover:bg-amber-100/60 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-1.5 bg-amber-100 text-amber-700 rounded-md">
+                        <AlertTriangle className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="font-semibold text-amber-950 block">{item.name}</span>
+                        <span className="text-[11px] text-amber-800">SKU: {item.sku}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-rose-700 font-bold block">
+                        {Number(item.currentStock).toFixed(1)} {item.unitSymbol || item.unitName}
+                      </span>
+                      <span className="text-[10px] text-amber-700 font-medium">Low stock</span>
+                    </div>
+                  </div>
+                ))}
+
+                {stats.lowStockAlerts.length > 5 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs text-amber-700 font-medium pt-1"
+                    onClick={() => navigate('/inventory')}
+                  >
+                    View all {stats.lowStockAlerts.length} low stock items →
+                  </Button>
+                )}
               </div>
-            </div>
+            )}
           </Card>
+        </div>
+      </div>
+
+      {/* Quick Access Operations Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div
+          onClick={() => navigate('/kitchen')}
+          className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-amber-50 text-amber-600 rounded-xl group-hover:scale-105 transition-transform">
+              <ChefHat className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-800">Kitchen Display (KDS)</h4>
+              <p className="text-xs text-slate-500">View real-time station bump bars</p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-all" />
+        </div>
+
+        <div
+          onClick={() => navigate('/tables')}
+          className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:scale-105 transition-transform">
+              <Grid className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-800">Floor & Tables</h4>
+              <p className="text-xs text-slate-500">Live floor blueprint & reservations</p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-all" />
+        </div>
+
+        <div
+          onClick={() => navigate('/billing')}
+          className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md cursor-pointer transition-all flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-105 transition-transform">
+              <Receipt className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-800">Billing & Settlements</h4>
+              <p className="text-xs text-slate-500">Open guest tabs & split payments</p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>
     </div>

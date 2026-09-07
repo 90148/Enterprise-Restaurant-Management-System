@@ -32,6 +32,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final KotService kotService;
     private final KotRepository kotRepository;
+    private final WebSocketEventService webSocketEventService;
 
     private static final List<OrderStatus> TERMINAL_STATUSES = List.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED);
 
@@ -44,7 +45,8 @@ public class OrderService {
                         ModifierRepository modifierRepository,
                         UserRepository userRepository,
                         KotService kotService,
-                        KotRepository kotRepository) {
+                        KotRepository kotRepository,
+                        WebSocketEventService webSocketEventService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.orderItemModifierRepository = orderItemModifierRepository;
@@ -55,6 +57,7 @@ public class OrderService {
         this.userRepository = userRepository;
         this.kotService = kotService;
         this.kotRepository = kotRepository;
+        this.webSocketEventService = webSocketEventService;
     }
 
     @Transactional
@@ -116,7 +119,14 @@ public class OrderService {
         // Auto-generate KOT for Kitchen Display System (Round 1)
         kotService.createKotForOrder(saved, createdItems, 1);
 
-        return mapToOrderDto(saved);
+        OrderDto result = mapToOrderDto(saved);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishOrderEvent("ORDER_CREATED", saved.getOutlet().getId(), saved.getId(), result);
+            if (saved.getTable() != null) {
+                webSocketEventService.publishTableEvent("TABLE_OCCUPIED", saved.getOutlet().getId(), saved.getTable().getId(), saved.getTable().getTableNumber());
+            }
+        }
+        return result;
     }
 
     @Transactional
@@ -185,7 +195,11 @@ public class OrderService {
         }
 
         Order saved = orderRepository.save(order);
-        return mapToOrderDto(saved);
+        OrderDto result = mapToOrderDto(saved);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishOrderEvent("ORDER_STATUS_CHANGED", saved.getOutlet().getId(), saved.getId(), result);
+        }
+        return result;
     }
 
     @Transactional

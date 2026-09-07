@@ -24,15 +24,18 @@ public class KotService {
     private final KotRepository kotRepository;
     private final KotItemRepository kotItemRepository;
     private final OrderRepository orderRepository;
+    private final WebSocketEventService webSocketEventService;
 
     private static final List<KotStatus> ACTIVE_STATUSES = List.of(KotStatus.NEW, KotStatus.PREPARING, KotStatus.READY);
 
     public KotService(KotRepository kotRepository,
                       KotItemRepository kotItemRepository,
-                      OrderRepository orderRepository) {
+                      OrderRepository orderRepository,
+                      WebSocketEventService webSocketEventService) {
         this.kotRepository = kotRepository;
         this.kotItemRepository = kotItemRepository;
         this.orderRepository = orderRepository;
+        this.webSocketEventService = webSocketEventService;
     }
 
     @Transactional
@@ -90,7 +93,11 @@ public class KotService {
         }
 
         Kot saved = kotRepository.save(kot);
-        return mapToKotDto(saved);
+        KotDto dto = mapToKotDto(saved);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishKitchenEvent("KOT_CREATED", outlet.getId(), saved.getId(), dto);
+        }
+        return dto;
     }
 
     @Transactional(readOnly = true)
@@ -171,7 +178,11 @@ public class KotService {
         }
 
         Kot saved = kotRepository.save(kot);
-        return mapToKotDto(saved);
+        KotDto dto = mapToKotDto(saved);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishKitchenEvent("KOT_STATUS_CHANGED", saved.getOutlet().getId(), saved.getId(), dto);
+        }
+        return dto;
     }
 
     @Transactional
@@ -192,7 +203,11 @@ public class KotService {
             }
         }
 
-        return mapToKotDto(parentKot);
+        KotDto dto = mapToKotDto(parentKot);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishKitchenEvent("ITEM_BUMPED", parentKot.getOutlet().getId(), item.getId(), dto);
+        }
+        return dto;
     }
 
     @Transactional

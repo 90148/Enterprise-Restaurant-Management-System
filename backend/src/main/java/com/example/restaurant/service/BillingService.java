@@ -29,6 +29,7 @@ public class BillingService {
     private final UserRepository userRepository;
 
     private final InventoryService inventoryService;
+    private final WebSocketEventService webSocketEventService;
 
     private static final List<OrderStatus> TERMINAL_ORDER_STATUSES = List.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED);
 
@@ -38,7 +39,8 @@ public class BillingService {
                           OrderRepository orderRepository,
                           RestaurantTableRepository restaurantTableRepository,
                           UserRepository userRepository,
-                          InventoryService inventoryService) {
+                          InventoryService inventoryService,
+                          WebSocketEventService webSocketEventService) {
         this.billRepository = billRepository;
         this.billItemRepository = billItemRepository;
         this.paymentRepository = paymentRepository;
@@ -46,6 +48,7 @@ public class BillingService {
         this.restaurantTableRepository = restaurantTableRepository;
         this.userRepository = userRepository;
         this.inventoryService = inventoryService;
+        this.webSocketEventService = webSocketEventService;
     }
 
     @Transactional
@@ -120,7 +123,14 @@ public class BillingService {
         }
 
         Bill saved = billRepository.save(bill);
-        return mapToBillDto(saved);
+        BillDto dto = mapToBillDto(saved);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishBillingEvent("BILL_CREATED", saved.getOutlet().getId(), saved.getId(), dto);
+            if (order.getTable() != null) {
+                webSocketEventService.publishTableEvent("TABLE_BILLING", saved.getOutlet().getId(), order.getTable().getId(), order.getTable().getTableNumber());
+            }
+        }
+        return dto;
     }
 
     @Transactional
@@ -207,6 +217,9 @@ public class BillingService {
                         RestaurantTable table = parentOrder.getTable();
                         table.setStatus(TableStatus.AVAILABLE);
                         restaurantTableRepository.save(table);
+                        if (webSocketEventService != null) {
+                            webSocketEventService.publishTableEvent("TABLE_RELEASED", bill.getOutlet().getId(), table.getId(), table.getTableNumber());
+                        }
                     }
                 }
             }
@@ -215,7 +228,11 @@ public class BillingService {
         }
 
         Bill saved = billRepository.save(bill);
-        return mapToBillDto(saved);
+        BillDto dto = mapToBillDto(saved);
+        if (webSocketEventService != null) {
+            webSocketEventService.publishBillingEvent(bill.getStatus() == BillStatus.PAID ? "BILL_PAID" : "BILL_UPDATED", saved.getOutlet().getId(), saved.getId(), dto);
+        }
+        return dto;
     }
 
     @Transactional(readOnly = true)

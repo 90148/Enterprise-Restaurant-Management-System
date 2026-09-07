@@ -46,5 +46,20 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query("SELECT COUNT(o) FROM Order o WHERE o.outlet.id = :outletId AND o.createdAt >= :startOfDay")
     long countTodayOrders(@Param("outletId") String outletId, @Param("startOfDay") LocalDateTime startOfDay);
 
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.outlet.id = :outletId AND o.status = 'COMPLETED' AND o.createdAt >= :startOfDay")
+    long countTodayCompletedOrders(@Param("outletId") String outletId, @Param("startOfDay") LocalDateTime startOfDay);
+
+    @Query("SELECT o.orderType, COUNT(o), SUM(o.totalAmount) " +
+           "FROM Order o WHERE o.outlet.id = :outletId " +
+           "AND o.status = 'COMPLETED' " +
+           "AND o.createdAt >= :startDate AND o.createdAt <= :endDate " +
+           "GROUP BY o.orderType " +
+           "ORDER BY SUM(o.totalAmount) DESC")
+    List<Object[]> findOrderTypeBreakdown(@Param("outletId") String outletId,
+                                         @Param("startDate") LocalDateTime startDate,
+                                         @Param("endDate") LocalDateTime endDate);
+
+    List<Order> findByOutletIdAndCreatedAtBetweenOrderByCreatedAtAsc(String outletId, LocalDateTime start, LocalDateTime end);
+
     Optional<Order> findByOrderNumber(String orderNumber);
 }

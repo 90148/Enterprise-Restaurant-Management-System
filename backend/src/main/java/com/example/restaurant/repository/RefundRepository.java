@@ -19,4 +19,11 @@ public interface RefundRepository extends JpaRepository<RefundTransaction, Strin
 
     @Query("SELECT COALESCE(SUM(r.amount), 0) FROM RefundTransaction r WHERE r.payment.outlet.id = :outletId AND r.createdAt >= :startOfDay")
     BigDecimal sumTodayRefunds(@Param("outletId") String outletId, @Param("startOfDay") LocalDateTime startOfDay);
+
+    @Query("SELECT COALESCE(SUM(r.amount), 0) FROM RefundTransaction r WHERE r.payment.outlet.id = :outletId AND r.createdAt >= :startDate AND r.createdAt <= :endDate")
+    BigDecimal sumRefundsBetween(@Param("outletId") String outletId,
+                                 @Param("startDate") LocalDateTime startDate,
+                                 @Param("endDate") LocalDateTime endDate);
+
+    List<RefundTransaction> findByPaymentBillOutletIdAndCreatedAtBetweenOrderByCreatedAtAsc(String outletId, LocalDateTime start, LocalDateTime end);
 }

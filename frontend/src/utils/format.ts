@@ -14,3 +14,8 @@ export const formatDateTime = (dateStr?: string | null): string => {
     return String(dateStr);
   }
 };
+
+export const formatCurrency = (amount?: number | null, symbol: string = '$'): string => {
+  if (amount == null || isNaN(amount)) return `${symbol}0.00`;
+  return `${symbol}${Number(amount).toFixed(2)}`;
+};

@@ -42,4 +42,14 @@ public interface BillRepository extends JpaRepository<Bill, String> {
                            @Param("status") BillStatus status,
                            @Param("search") String search,
                            Pageable pageable);
+
+    List<Bill> findByOutletIdAndCreatedAtBetweenOrderByCreatedAtAsc(String outletId, LocalDateTime start, LocalDateTime end);
+
+    List<Bill> findByOutletIdAndStatusAndCreatedAtBetweenOrderByCreatedAtAsc(String outletId, BillStatus status, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT COALESCE(SUM(b.paidAmount), 0) FROM Bill b WHERE b.outlet.id = :outletId AND b.status = 'PAID' AND b.createdAt >= :start AND b.createdAt <= :end")
+    BigDecimal sumRevenueBetween(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(b) FROM Bill b WHERE b.outlet.id = :outletId AND b.createdAt >= :start AND b.createdAt <= :end")
+    long countBillsBetween(@Param("outletId") String outletId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

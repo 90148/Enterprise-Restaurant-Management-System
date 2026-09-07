@@ -21,6 +21,8 @@ import { BillingListPage } from '@/pages/billing/BillingListPage';
 import { InventoryListPage } from '@/pages/inventory/InventoryListPage';
 import { PurchaseOrderListPage } from '@/pages/purchases/PurchaseOrderListPage';
 import { RefundListPage } from '@/pages/refunds/RefundListPage';
+import SalesReportPage from '@/pages/reports/SalesReportPage';
+import SettingsPage from '@/pages/settings/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -175,6 +177,34 @@ export const App: React.FC = () => {
                     <RefundListPage />
                   </RoleBasedRoute>
                 }
+              />
+
+              {/* Reports & Analytics */}
+              <Route
+                path="reports/sales"
+                element={
+                  <RoleBasedRoute requiredPermission="REPORT_VIEW">
+                    <SalesReportPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="reports"
+                element={<Navigate to="/reports/sales" replace />}
+              />
+
+              {/* Preferences & Settings */}
+              <Route
+                path="settings/preferences"
+                element={
+                  <RoleBasedRoute requiredPermission="SETTINGS_VIEW">
+                    <SettingsPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="settings"
+                element={<Navigate to="/settings/preferences" replace />}
               />
 
               {/* Fallback */}
