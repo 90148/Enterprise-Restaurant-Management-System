@@ -232,6 +232,10 @@ public class Order {
         return items;
     }
 
+    public List<OrderItem> getOrderItems() {
+        return items;
+    }
+
     public void setItems(List<OrderItem> items) {
         this.items = items != null ? items : new ArrayList<>();
     }

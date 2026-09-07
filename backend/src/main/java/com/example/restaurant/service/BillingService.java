@@ -28,6 +28,8 @@ public class BillingService {
     private final RestaurantTableRepository restaurantTableRepository;
     private final UserRepository userRepository;
 
+    private final InventoryService inventoryService;
+
     private static final List<OrderStatus> TERMINAL_ORDER_STATUSES = List.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED);
 
     public BillingService(BillRepository billRepository,
@@ -35,13 +37,15 @@ public class BillingService {
                           PaymentRepository paymentRepository,
                           OrderRepository orderRepository,
                           RestaurantTableRepository restaurantTableRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          InventoryService inventoryService) {
         this.billRepository = billRepository;
         this.billItemRepository = billItemRepository;
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
         this.restaurantTableRepository = restaurantTableRepository;
         this.userRepository = userRepository;
+        this.inventoryService = inventoryService;
     }
 
     @Transactional
@@ -189,6 +193,9 @@ public class BillingService {
             if (parentOrder != null && parentOrder.getStatus() != OrderStatus.COMPLETED) {
                 parentOrder.setStatus(OrderStatus.COMPLETED);
                 orderRepository.save(parentOrder);
+
+                // Deduct recipe ingredient stock for the completed order
+                inventoryService.deductStockForOrder(parentOrder);
 
                 // Release table if Dine-In
                 if (parentOrder.getTable() != null) {

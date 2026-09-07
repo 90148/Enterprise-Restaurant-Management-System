@@ -18,6 +18,9 @@ import { PosPage } from '@/pages/pos/PosPage';
 import { OrderListPage } from '@/pages/orders/OrderListPage';
 import { KitchenDisplayPage } from '@/pages/kitchen/KitchenDisplayPage';
 import { BillingListPage } from '@/pages/billing/BillingListPage';
+import { InventoryListPage } from '@/pages/inventory/InventoryListPage';
+import { PurchaseOrderListPage } from '@/pages/purchases/PurchaseOrderListPage';
+import { RefundListPage } from '@/pages/refunds/RefundListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -146,6 +149,30 @@ export const App: React.FC = () => {
                 element={
                   <RoleBasedRoute requiredPermission="BILL_VIEW">
                     <BillingListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="inventory"
+                element={
+                  <RoleBasedRoute requiredPermission="INVENTORY_VIEW">
+                    <InventoryListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="purchases"
+                element={
+                  <RoleBasedRoute requiredPermission="INVENTORY_UPDATE">
+                    <PurchaseOrderListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="refunds"
+                element={
+                  <RoleBasedRoute requiredPermission="PAYMENT_REFUND">
+                    <RefundListPage />
                   </RoleBasedRoute>
                 }
               />
