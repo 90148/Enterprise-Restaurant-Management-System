@@ -1,5 +1,12 @@
 import { Client, IMessage } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
+
+const ensureSockJsGlobal = () => {
+  const globalRef = globalThis as typeof globalThis & { global?: typeof globalThis };
+
+  if (!globalRef.global) {
+    globalRef.global = globalThis;
+  }
+};
 
 export type WsEventType =
   | 'ORDER_CREATED'
@@ -34,38 +41,44 @@ class WebSocketManager {
       return;
     }
 
-    this.client = new Client({
-      webSocketFactory: () => new SockJS(url),
-      reconnectDelay: 5000,
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
-      onConnect: () => {
-        this.isConnected = true;
-        console.log('[WebSocket] Connected to STOMP Broker');
+    ensureSockJsGlobal();
 
-        // Subscribe to operational topics
-        const topics = ['/topic/orders', '/topic/kitchen', '/topic/tables', '/topic/billing'];
-        topics.forEach((topic) => {
-          this.client?.subscribe(topic, (message: IMessage) => {
-            try {
-              const payload: WsMessagePayload = JSON.parse(message.body);
-              this.notifyHandlers(payload);
-            } catch (err) {
-              console.warn('[WebSocket] Error parsing message body:', err);
-            }
+    void import('sockjs-client').then(({ default: SockJS }) => {
+      this.client = new Client({
+        webSocketFactory: () => new SockJS(url),
+        reconnectDelay: 5000,
+        heartbeatIncoming: 10000,
+        heartbeatOutgoing: 10000,
+        onConnect: () => {
+          this.isConnected = true;
+          console.log('[WebSocket] Connected to STOMP Broker');
+
+          // Subscribe to operational topics
+          const topics = ['/topic/orders', '/topic/kitchen', '/topic/tables', '/topic/billing'];
+          topics.forEach((topic) => {
+            this.client?.subscribe(topic, (message: IMessage) => {
+              try {
+                const payload: WsMessagePayload = JSON.parse(message.body);
+                this.notifyHandlers(payload);
+              } catch (err) {
+                console.warn('[WebSocket] Error parsing message body:', err);
+              }
+            });
           });
-        });
-      },
-      onDisconnect: () => {
-        this.isConnected = false;
-        console.log('[WebSocket] Disconnected');
-      },
-      onStompError: (frame) => {
-        console.error('[WebSocket] Broker error: ' + frame.headers['message']);
-      },
-    });
+        },
+        onDisconnect: () => {
+          this.isConnected = false;
+          console.log('[WebSocket] Disconnected');
+        },
+        onStompError: (frame) => {
+          console.error('[WebSocket] Broker error: ' + frame.headers['message']);
+        },
+      });
 
-    this.client.activate();
+      this.client.activate();
+    }).catch((error) => {
+      console.error('[WebSocket] Failed to initialize SockJS client:', error);
+    });
   }
 
   public disconnect() {

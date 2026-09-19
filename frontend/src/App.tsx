@@ -24,6 +24,20 @@ import { RefundListPage } from '@/pages/refunds/RefundListPage';
 import SalesReportPage from '@/pages/reports/SalesReportPage';
 import SettingsPage from '@/pages/settings/SettingsPage';
 
+// Customer Experience
+import { CustomerProvider } from '@/context/CustomerContext';
+import { CustomerCartProvider } from '@/context/CustomerCartContext';
+import { CustomerFavoritesProvider } from '@/context/CustomerFavoritesContext';
+import { CustomerNotificationProvider } from '@/context/CustomerNotificationContext';
+import CustomerLayout from '@/components/customer/layout/CustomerLayout';
+import CustomerHomePage from '@/pages/customer/CustomerHomePage';
+import CustomerMenuPage from '@/pages/customer/CustomerMenuPage';
+import CustomerCheckoutPage from '@/pages/customer/CustomerCheckoutPage';
+import CustomerOrdersPage from '@/pages/customer/CustomerOrdersPage';
+import CustomerFavoritesPage from '@/pages/customer/CustomerFavoritesPage';
+import CustomerOffersPage from '@/pages/customer/CustomerOffersPage';
+import CustomerProfilePage from '@/pages/customer/CustomerProfilePage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -39,9 +53,25 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <Routes>
-            {/* Public Auth Route */}
-            <Route path="/login" element={<LoginPage />} />
+          <CustomerProvider>
+            <CustomerCartProvider>
+              <CustomerFavoritesProvider>
+                <CustomerNotificationProvider>
+                  <Routes>
+                    {/* Customer Experience Routes (Public / Guest Friendly) */}
+                    <Route path="/customer" element={<CustomerLayout />}>
+                      <Route index element={<Navigate to="/customer/home" replace />} />
+                      <Route path="home" element={<CustomerHomePage />} />
+                      <Route path="menu" element={<CustomerMenuPage />} />
+                      <Route path="checkout" element={<CustomerCheckoutPage />} />
+                      <Route path="orders" element={<CustomerOrdersPage />} />
+                      <Route path="favorites" element={<CustomerFavoritesPage />} />
+                      <Route path="offers" element={<CustomerOffersPage />} />
+                      <Route path="profile" element={<CustomerProfilePage />} />
+                    </Route>
+
+                    {/* Public Auth Route */}
+                    <Route path="/login" element={<LoginPage />} />
 
             {/* Protected Routes */}
             <Route
@@ -214,6 +244,10 @@ export const App: React.FC = () => {
             {/* Global Fallback */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
+                </CustomerNotificationProvider>
+              </CustomerFavoritesProvider>
+            </CustomerCartProvider>
+          </CustomerProvider>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>

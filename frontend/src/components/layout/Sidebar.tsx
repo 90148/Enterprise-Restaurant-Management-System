@@ -18,6 +18,8 @@ import {
   Settings,
   Users,
   ShieldAlert,
+  Sparkles,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { clsx } from 'clsx';
@@ -93,6 +95,28 @@ export const Sidebar: React.FC = () => {
           </NavLink>
         ))}
       </nav>
+
+      {/* Customer Experience Portal Trigger */}
+      <div className="px-3 py-2 border-t border-slate-800">
+        <a
+          href="/customer/home"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between p-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border border-amber-500/20 transition-all text-amber-300 group"
+          title="Open Customer Dining Experience in a new tab"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-md bg-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
+            <div className="leading-tight text-left">
+              <span className="text-xs font-semibold block text-white">Customer App</span>
+              <span className="text-[10px] text-amber-400/80">Digital Dining Experience</span>
+            </div>
+          </div>
+          <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+        </a>
+      </div>
 
       {/* Footer Info */}
       <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between">

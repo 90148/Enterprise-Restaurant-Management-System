@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { outletApi } from '@/api/outlets';
-import { LogOut, User as UserIcon, Store, ChevronDown } from 'lucide-react';
+import { LogOut, User as UserIcon, Store, ChevronDown, UtensilsCrossed, ExternalLink } from 'lucide-react';
 import Button from '@/components/common/Button';
 
 export const Navbar: React.FC = () => {
@@ -43,8 +44,21 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* User Actions */}
+      {/* User Actions & Customer App Switcher */}
       <div className="flex items-center gap-4">
+        {/* Customer Experience Portal Link */}
+        <Link
+          to="/customer/home"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg transition-colors shadow-sm group"
+          title="Open Customer Dining Experience in a new tab"
+        >
+          <UtensilsCrossed className="w-3.5 h-3.5 text-amber-600 group-hover:rotate-12 transition-transform" />
+          <span className="hidden sm:inline">Customer App</span>
+          <ExternalLink className="w-3 h-3 text-amber-500" />
+        </Link>
+
         <div className="flex items-center gap-3 text-right">
           <div className="hidden sm:block">
             <p className="text-xs font-semibold text-slate-800">{user?.fullName || user?.username || 'User'}</p>
