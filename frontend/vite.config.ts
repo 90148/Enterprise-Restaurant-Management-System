@@ -11,17 +11,19 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
-      },
-      '/ws': {
-        target: 'http://localhost:8080',
-        ws: true,
-      },
+  host: '0.0.0.0',
+  port: 3000,
+  allowedHosts: ['entire-voice-spinach.ngrok-free.dev'],
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8080',
+      changeOrigin: true,
+      secure: false,
+    },
+    '/ws': {
+      target: 'http://localhost:8080',
+      ws: true,
     },
   },
+}
 });

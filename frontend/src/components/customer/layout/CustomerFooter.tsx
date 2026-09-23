@@ -118,11 +118,11 @@ export const CustomerFooter: React.FC = () => {
           <ul className="space-y-2 text-xs">
             <li className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-amber-400" />
-              <span>+91 44 2833 4900</span>
+              <span>+91 9014822734</span>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-amber-400" />
-              <span>reservations@restomaster.com</span>
+              <span>dsp.trend@restomaster.com</span>
             </li>
             <li className="pt-2">
               <Link
