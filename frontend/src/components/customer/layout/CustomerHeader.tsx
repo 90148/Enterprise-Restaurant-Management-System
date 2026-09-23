@@ -65,8 +65,8 @@ export const CustomerHeader: React.FC = () => {
       {/* Main Navigation Bar */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-3 min-w-0">
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-6 min-w-0">
-          <Link to="/customer/home" className="flex items-center gap-3 group min-w-0">
+        <div className="flex items-center gap-2 sm:gap-6 min-w-0">
+          <Link to="/customer/home" className="flex items-center gap-2 sm:gap-3 group min-w-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
               <UtensilsCrossed className="w-5 h-5 text-slate-950 font-bold" />
             </div>
@@ -75,7 +75,7 @@ export const CustomerHeader: React.FC = () => {
                 <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight truncate bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent">
                   RestoMaster
                 </span>
-                <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded">
                   Dining
                 </span>
               </div>
@@ -158,7 +158,7 @@ export const CustomerHeader: React.FC = () => {
           {/* Favorites Button */}
           <Link
             to="/customer/favorites"
-            className="relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-rose-400 transition-colors"
+            className="hidden sm:flex relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-rose-400 transition-colors"
             title="Saved Favorites"
           >
             <Heart className="w-4 h-4" />
@@ -173,7 +173,7 @@ export const CustomerHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsNotificationOpen(true)}
-            className="relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-amber-400 transition-colors"
+            className="hidden sm:flex relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-amber-400 transition-colors"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
@@ -188,7 +188,7 @@ export const CustomerHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsCartOpen(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all active:scale-95"
+            className="flex items-center gap-2 px-2.5 sm:px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all active:scale-95"
             title="View Cart"
           >
             <div className="relative">
@@ -208,7 +208,7 @@ export const CustomerHeader: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsAuthModalOpen(true)}
-            className="flex items-center gap-2 pl-1 pr-2.5 py-1 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-full transition-colors"
+            className="flex items-center gap-1 sm:gap-2 pl-1 pr-1.5 sm:pr-2.5 py-1 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-full transition-colors"
           >
             <div className="w-7 h-7 rounded-full overflow-hidden bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
               {customer.avatarUrl ? (
