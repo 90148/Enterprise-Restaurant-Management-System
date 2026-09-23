@@ -25,6 +25,15 @@ export const useCustomerOrders = () => {
 
   useEffect(() => {
     refreshOrders();
+
+    const handleUpdated = () => {
+      refreshOrders();
+    };
+
+    window.addEventListener('restomaster_customer_data_updated', handleUpdated);
+    return () => {
+      window.removeEventListener('restomaster_customer_data_updated', handleUpdated);
+    };
   }, [refreshOrders]);
 
   const activeOrders = orders.filter(

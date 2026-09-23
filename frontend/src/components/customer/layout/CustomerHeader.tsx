@@ -49,10 +49,10 @@ export const CustomerHeader: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white shadow-xl transition-all">
       {/* Top Banner: Promotional / Outlet Status */}
-      <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-orange-600 text-slate-950 px-4 py-1.5 text-xs font-semibold flex items-center justify-between">
-        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full px-2">
+      <div className="w-full bg-gradient-to-r from-amber-600 via-amber-500 to-orange-600 text-slate-950 px-4 py-1.5 text-xs font-semibold flex items-center justify-between">
+        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full min-w-0 px-2">
           <Sparkles className="w-3.5 h-3.5 animate-spin text-slate-950" />
-          <span>
+          <span className="truncate">
             Feast in Luxury: Use code <strong className="underline tracking-wide">FEAST20</strong> for 20% off
             gourmet dine-in and online orders!
           </span>
@@ -63,16 +63,16 @@ export const CustomerHeader: React.FC = () => {
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-3">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-3 min-w-0">
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-6">
-          <Link to="/customer/home" className="flex items-center gap-3 group">
+        <div className="flex items-center gap-6 min-w-0">
+          <Link to="/customer/home" className="flex items-center gap-3 group min-w-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
               <UtensilsCrossed className="w-5 h-5 text-slate-950 font-bold" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent">
+                <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight truncate bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent">
                   RestoMaster
                 </span>
                 <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded">

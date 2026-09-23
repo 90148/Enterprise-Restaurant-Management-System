@@ -370,7 +370,7 @@ export const FloorTableManagementPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-wide flex items-center gap-2.5">
+          <h1 className="text-xl font-bold text-black tracking-wide flex items-center gap-2.5">
             <Layers className="w-6 h-6 text-emerald-500" />
             Floor & Table Management
           </h1>

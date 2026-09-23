@@ -37,6 +37,7 @@ import CustomerOrdersPage from '@/pages/customer/CustomerOrdersPage';
 import CustomerFavoritesPage from '@/pages/customer/CustomerFavoritesPage';
 import CustomerOffersPage from '@/pages/customer/CustomerOffersPage';
 import CustomerProfilePage from '@/pages/customer/CustomerProfilePage';
+import CustomerPortalManagerPage from '@/pages/admin/CustomerPortalManagerPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -147,6 +148,14 @@ export const App: React.FC = () => {
                 element={
                   <RoleBasedRoute requiredPermission="MENU_VIEW">
                     <RecipeListPage />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="customer-management"
+                element={
+                  <RoleBasedRoute requiredPermission="MENU_VIEW">
+                    <CustomerPortalManagerPage />
                   </RoleBasedRoute>
                 }
               />

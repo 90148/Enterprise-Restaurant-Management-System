@@ -347,7 +347,7 @@ export const MenuItemListPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-wide flex items-center gap-2.5">
+          <h1 className="text-xl font-bold text-black tracking-wide flex items-center gap-2.5">
             <UtensilsCrossed className="w-6 h-6 text-emerald-500" />
             Menu Catalog & Pricing
           </h1>
@@ -361,6 +361,13 @@ export const MenuItemListPage: React.FC = () => {
             <Button variant="outline" size="sm" className="flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5 text-amber-400" />
               Manage Recipes & BOM
+            </Button>
+          </Link>
+
+          <Link to="/customer-management">
+            <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-amber-500/40 text-amber-300 hover:bg-amber-500/10">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              Customer Digital Menu
             </Button>
           </Link>
 

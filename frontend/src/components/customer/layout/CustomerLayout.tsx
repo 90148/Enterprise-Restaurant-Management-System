@@ -13,7 +13,7 @@ import { CallWaiterModal } from '../dinein/CallWaiterModal';
 
 export const CustomerLayout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
+    <div className="w-full min-h-screen min-w-0 overflow-x-hidden bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
       {/* Top Header Navigation */}
       <CustomerHeader />
 

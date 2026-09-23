@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,6 +13,11 @@ import {
   Radio,
   RefreshCw,
   ArrowRight,
+  UtensilsCrossed,
+  BellRing,
+  Star,
+  Plus,
+  ExternalLink,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -30,6 +35,15 @@ import { getDashboardStats } from '@/api/report';
 import { formatCurrency } from '@/utils/format';
 import { useAuth } from '@/context/AuthContext';
 import { useWebSocketSync } from '@/hooks/useWebSocketSync';
+import {
+  getCustomerOperationsStats,
+  getServiceRequests,
+  getStoredMenuItems,
+  toggleItemAvailability,
+  updateServiceRequestStatus,
+} from '@/services/customerService';
+import { AdminCustomerFoodModal } from '@/components/admin/AdminCustomerFoodModal';
+import { ServiceRequest, FoodItem } from '@/types/customer';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -55,6 +69,41 @@ export const DashboardPage: React.FC = () => {
     orders: h.orderCount || 0,
   })) || [];
 
+  // Customer operations state
+  const [customerStats, setCustomerStats] = useState(() => getCustomerOperationsStats());
+  const [recentServiceCalls, setRecentServiceCalls] = useState<ServiceRequest[]>([]);
+  const [customerWatchlist, setCustomerWatchlist] = useState<FoodItem[]>([]);
+  const [isAddCustomerDishOpen, setIsAddCustomerDishOpen] = useState(false);
+
+  const loadCustomerDashboardData = () => {
+    setCustomerStats(getCustomerOperationsStats());
+    setRecentServiceCalls(getServiceRequests().slice(0, 5));
+    setCustomerWatchlist(getStoredMenuItems().slice(0, 6));
+  };
+
+  useEffect(() => {
+    loadCustomerDashboardData();
+
+    const handleUpdated = () => {
+      loadCustomerDashboardData();
+    };
+
+    window.addEventListener('restomaster_customer_data_updated', handleUpdated);
+    return () => {
+      window.removeEventListener('restomaster_customer_data_updated', handleUpdated);
+    };
+  }, []);
+
+  const handleResolveService = (id: string) => {
+    updateServiceRequestStatus(id, 'RESOLVED');
+    loadCustomerDashboardData();
+  };
+
+  const handleToggleDishStock = (id: string) => {
+    toggleItemAvailability(id);
+    loadCustomerDashboardData();
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -79,7 +128,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Quick Action Shortcuts */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -90,6 +139,26 @@ export const DashboardPage: React.FC = () => {
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Refresh</span>
           </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsAddCustomerDishOpen(true)}
+            leftIcon={<Plus className="w-3.5 h-3.5 text-amber-600" />}
+            className="border-amber-300 bg-amber-50/70 hover:bg-amber-100 text-amber-900 font-semibold"
+          >
+            + Add Customer Dish
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate('/customer-management')}
+            leftIcon={<UtensilsCrossed className="w-3.5 h-3.5 text-slate-700" />}
+          >
+            Customer Hub
+          </Button>
+
           <Button
             variant="primary"
             size="sm"
@@ -323,8 +392,214 @@ export const DashboardPage: React.FC = () => {
           <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-700 group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>
+
+      {/* Customer Experience & Online Dining Operations Section */}
+      <div className="pt-2 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900">Customer Portal Operations</h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                Digital Dining Active
+              </span>
+            </div>
+            <p className="text-xs text-slate-500">
+              Live metrics, table assistance requests, and fast dish stock management for the customer app
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <a
+              href="/customer/home"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
+            >
+              <span>View Customer App</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/customer-management')}
+              className="text-xs font-semibold"
+            >
+              Full Customer Hub →
+            </Button>
+          </div>
+        </div>
+
+        {/* Customer KPIs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Customer Online Orders"
+            value={customerStats.totalCustomerOrders}
+            icon={<ShoppingBag className="w-5 h-5" />}
+            description={`₹${customerStats.totalCustomerRevenue.toLocaleString()} online revenue`}
+            color="emerald"
+          />
+          <StatCard
+            title="Pending Table Calls"
+            value={customerStats.pendingServiceRequests}
+            icon={<BellRing className="w-5 h-5" />}
+            description={
+              customerStats.pendingServiceRequests > 0
+                ? 'Action required at dining tables'
+                : 'All table requests attended'
+            }
+            color={customerStats.pendingServiceRequests > 0 ? 'rose' : 'blue'}
+          />
+          <StatCard
+            title="Customer Menu Dishes"
+            value={`${customerStats.inStockDishes} / ${customerStats.totalDishes}`}
+            icon={<UtensilsCrossed className="w-5 h-5" />}
+            description={`${customerStats.outOfStockDishes} dishes currently 86'd`}
+            color="purple"
+          />
+          <StatCard
+            title="Customer Rating Score"
+            value={`${customerStats.averageRating} ★`}
+            icon={<Star className="w-5 h-5" />}
+            description={`${customerStats.totalReviews} diner reviews submitted`}
+            color="amber"
+          />
+        </div>
+
+        {/* 2-Column Operational Grid: In-seat Calls + Quick 86'ing */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Table Service Calls */}
+          <Card
+            title="Live Table Assistance Queue"
+            subtitle="Real-time calls from seated guests (Call Waiter, Water, Bill, Clean)"
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/customer-management')}
+                className="text-xs text-amber-700 hover:text-amber-800 font-semibold"
+              >
+                View All
+              </Button>
+            }
+          >
+            {recentServiceCalls.length === 0 ? (
+              <div className="py-8 text-center text-slate-400 text-xs space-y-1">
+                <CheckCircle2 className="w-7 h-7 text-emerald-500 mx-auto opacity-80" />
+                <p className="font-semibold text-slate-700">No Pending Table Calls</p>
+                <p className="text-slate-400">All dining tables are comfortable and serviced.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {recentServiceCalls.map((req) => (
+                  <div
+                    key={req.id}
+                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                        Table {req.tableNumber}
+                      </span>
+                      <div>
+                        <span className="font-semibold text-slate-800 block">
+                          {(req.requestType === 'WAITER' || (req.requestType as string) === 'CALL_WAITER') && '🔔 Call Waiter'}
+                          {req.requestType === 'WATER' && '💧 Drinking Water'}
+                          {req.requestType === 'BILL' && '🧾 Final Bill'}
+                          {(req.requestType === 'CLEAN' || (req.requestType as string) === 'CLEAN_TABLE') && '🧹 Table Clean'}
+                        </span>
+                        <span className="text-[10px] text-slate-400">{req.timestamp || req.createdAt}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          req.status === 'PENDING'
+                            ? 'bg-rose-100 text-rose-700 animate-pulse'
+                            : 'bg-emerald-100 text-emerald-700'
+                        }`}
+                      >
+                        {req.status}
+                      </span>
+                      {req.status !== 'RESOLVED' && (
+                        <button
+                          type="button"
+                          onClick={() => handleResolveService(req.id)}
+                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold transition-colors"
+                        >
+                          Resolve
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          {/* Quick Dish Availability & 86'ing */}
+          <Card
+            title="Fast Dish Stock Control (86'ing)"
+            subtitle="Instantly enable or disable items from appearing on customer digital menus"
+            action={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsAddCustomerDishOpen(true)}
+                className="text-xs text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Dish</span>
+              </Button>
+            }
+          >
+            <div className="space-y-2">
+              {customerWatchlist.map((dish) => (
+                <div
+                  key={dish.id}
+                  className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-xs"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 shrink-0">
+                      <img src={dish.imageUrl} alt={dish.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <span className="font-semibold text-slate-900 block truncate max-w-[180px] sm:max-w-xs">
+                        {dish.name}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono">
+                        ₹{dish.price} • {dish.cuisine}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleDishStock(dish.id)}
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition-colors ${
+                      dish.isAvailable
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                        : 'bg-rose-50 text-rose-700 border-rose-300 hover:bg-rose-100'
+                    }`}
+                  >
+                    {dish.isAvailable ? '● In Stock' : '✕ 86 Out'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Admin Customer Dish Creation Modal */}
+      <AdminCustomerFoodModal
+        isOpen={isAddCustomerDishOpen}
+        onClose={() => setIsAddCustomerDishOpen(false)}
+        onSuccess={() => {
+          loadCustomerDashboardData();
+        }}
+      />
     </div>
   );
 };
 
 export default DashboardPage;
+

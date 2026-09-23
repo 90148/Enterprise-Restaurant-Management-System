@@ -45,6 +45,7 @@ export const Sidebar: React.FC = () => {
     { name: 'Payments', path: '/payments', icon: <CreditCard className="w-5 h-5" />, permission: 'PAYMENT_CREATE' },
     { name: 'Refunds', path: '/refunds', icon: <RotateCcw className="w-5 h-5" />, permission: 'PAYMENT_REFUND' },
     { name: 'Menu Items', path: '/menu/items', icon: <UtensilsCrossed className="w-5 h-5" />, permission: 'MENU_VIEW' },
+    { name: 'Customer Portal Hub', path: '/customer-management', icon: <Sparkles className="w-5 h-5 text-amber-400" />, permission: 'MENU_VIEW' },
     { name: 'Recipes', path: '/recipes', icon: <BookOpen className="w-5 h-5" />, permission: 'MENU_VIEW' },
     { name: 'Inventory', path: '/inventory', icon: <Boxes className="w-5 h-5" />, permission: 'INVENTORY_VIEW' },
     { name: 'Purchasing', path: '/purchases', icon: <Truck className="w-5 h-5" />, permission: 'INVENTORY_UPDATE' },

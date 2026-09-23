@@ -68,6 +68,7 @@ export interface FoodVariant {
   id: string;
   name: string; // e.g. "Small (6\")", "Medium (10\")", "Large (14\")" or "Single", "Full"
   price: number;
+  priceDelta?: number;
   originalPrice?: number;
   isDefault?: boolean;
 }
@@ -77,7 +78,7 @@ export interface FoodItem {
   name: string;
   description: string;
   categoryId: string;
-  categoryName: string;
+  categoryName?: string;
   cuisine: string;
   price: number;
   originalPrice?: number;
@@ -93,6 +94,12 @@ export interface FoodItem {
   reviewCount: number;
   prepTimeMinutes: number;
   calories?: number;
+  nutritionFacts?: {
+    calories: number;
+    proteinGrams: number;
+    carbsGrams: number;
+    fatGrams: number;
+  };
   allergens?: string[];
   ingredients?: string[];
   imageUrl: string;
@@ -170,6 +177,8 @@ export interface TrackingStep {
 
 export interface CustomerOrder {
   id: string;
+  customerName?: string;
+  customerPhone?: string;
   orderNumber: string;
   outletId: string;
   outletName: string;
@@ -209,9 +218,11 @@ export interface CustomerNotification {
 export interface CustomerReview {
   id: string;
   orderId: string;
+  customerName?: string;
   foodRating: number;
   serviceRating: number;
-  experienceRating: number;
+  experienceRating?: number;
+  ambienceRating?: number;
   comment: string;
   itemRatings?: { [dishId: string]: boolean }; // true=like, false=dislike
   createdAt: string;
@@ -220,10 +231,12 @@ export interface CustomerReview {
 export interface ServiceRequest {
   id: string;
   tableNumber: string;
-  outletId: string;
+  outletId?: string;
   requestType: 'WAITER' | 'WATER' | 'BILL' | 'CLEAN';
   createdAt: string;
-  status: 'PENDING' | 'RESOLVED';
+  timestamp?: string;
+  status: 'PENDING' | 'RESOLVED' | 'ACKNOWLEDGED';
+  notes?: string;
 }
 
 export interface SplitPerson {

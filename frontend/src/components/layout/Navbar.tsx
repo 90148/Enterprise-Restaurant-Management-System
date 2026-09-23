@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { outletApi } from '@/api/outlets';
-import { LogOut, User as UserIcon, Store, ChevronDown, UtensilsCrossed, ExternalLink } from 'lucide-react';
+import {
+  LogOut,
+  User as UserIcon,
+  Store,
+  ChevronDown,
+  UtensilsCrossed,
+  ExternalLink,
+  BellRing,
+} from 'lucide-react';
 import Button from '@/components/common/Button';
+import { getServiceRequests } from '@/services/customerService';
 
 export const Navbar: React.FC = () => {
   const { user, logout, activeOutletId, setActiveOutlet } = useAuth();
+  const [pendingCalls, setPendingCalls] = useState(0);
+
+  useEffect(() => {
+    const checkCalls = () => {
+      const requests = getServiceRequests();
+      setPendingCalls(requests.filter((r) => r.status === 'PENDING').length);
+    };
+    checkCalls();
+
+    window.addEventListener('restomaster_customer_data_updated', checkCalls);
+    return () => {
+      window.removeEventListener('restomaster_customer_data_updated', checkCalls);
+    };
+  }, []);
 
   const { data: activeOutlets = [] } = useQuery({
     queryKey: ['outlets-active'],
@@ -45,7 +68,19 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* User Actions & Customer App Switcher */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        {/* Table Service Calls Alert Badge */}
+        {pendingCalls > 0 && (
+          <Link
+            to="/customer-management"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold transition-colors animate-pulse"
+            title={`${pendingCalls} pending table assistance requests`}
+          >
+            <BellRing className="w-3.5 h-3.5 text-rose-600" />
+            <span>{pendingCalls} Table Calls</span>
+          </Link>
+        )}
+
         {/* Customer Experience Portal Link */}
         <Link
           to="/customer/home"

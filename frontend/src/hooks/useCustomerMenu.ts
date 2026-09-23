@@ -25,27 +25,38 @@ export const useCustomerMenu = (initialCategory = 'all') => {
 
   useEffect(() => {
     let isMounted = true;
-    setIsLoading(true);
 
-    Promise.all([
-      getCategories(),
-      getMenuItems(),
-      getPopularItems(),
-      getChefSpecials(),
-      getCombos(),
-    ]).then(([cats, items, pop, specials, comboList]) => {
-      if (isMounted) {
-        setCategories(cats);
-        setAllItems(items);
-        setPopularDishes(pop);
-        setChefSpecials(specials);
-        setCombos(comboList);
-        setIsLoading(false);
-      }
-    });
+    const fetchMenuData = () => {
+      setIsLoading(true);
+      Promise.all([
+        getCategories(),
+        getMenuItems(),
+        getPopularItems(),
+        getChefSpecials(),
+        getCombos(),
+      ]).then(([cats, items, pop, specials, comboList]) => {
+        if (isMounted) {
+          setCategories(cats);
+          setAllItems(items);
+          setPopularDishes(pop);
+          setChefSpecials(specials);
+          setCombos(comboList);
+          setIsLoading(false);
+        }
+      });
+    };
+
+    fetchMenuData();
+
+    const handleDataUpdated = () => {
+      fetchMenuData();
+    };
+
+    window.addEventListener('restomaster_customer_data_updated', handleDataUpdated);
 
     return () => {
       isMounted = false;
+      window.removeEventListener('restomaster_customer_data_updated', handleDataUpdated);
     };
   }, []);
 

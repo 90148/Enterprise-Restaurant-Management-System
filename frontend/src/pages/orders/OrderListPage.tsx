@@ -142,7 +142,7 @@ export const OrderListPage: React.FC = () => {
       {/* Top Header & New Order Action */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-wide">Live Orders & History</h1>
+          <h1 className="text-xl font-bold text-black tracking-wide">Live Orders & History</h1>
           <p className="text-xs text-slate-400 mt-0.5">
             Monitor real-time kitchen tickets, table tabs, and order lifecycle states
           </p>
