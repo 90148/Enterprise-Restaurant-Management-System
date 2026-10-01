@@ -131,6 +131,13 @@ public class DataInitializer implements CommandLineRunner {
         waiterPerms.add(permMap.get("OUTLET_VIEW"));
         Role waiterRole = getOrCreateRole("WAITER", "Waitstaff for dining table management", waiterPerms);
 
+        Set<Permission> customerPerms = new HashSet<>();
+        customerPerms.add(permMap.get("MENU_VIEW"));
+        customerPerms.add(permMap.get("OUTLET_VIEW"));
+        customerPerms.add(permMap.get("ORDER_CREATE"));
+        customerPerms.add(permMap.get("ORDER_VIEW"));
+        Role customerRole = getOrCreateRole("CUSTOMER", "Customer ordering and order tracking", customerPerms);
+
         Set<Permission> kitchenPerms = new HashSet<>();
         kitchenPerms.add(permMap.get("KITCHEN_VIEW"));
         kitchenPerms.add(permMap.get("KITCHEN_UPDATE"));
@@ -148,6 +155,7 @@ public class DataInitializer implements CommandLineRunner {
         createUserIfAbsent("manager", "manager@restomaster.io", "Manager@123", "Alice Manager", "+1-555-0101", defaultOutlet, Set.of(managerRole), true);
         createUserIfAbsent("cashier", "cashier@restomaster.io", "Cashier@123", "John Cashier", "+1-555-0102", defaultOutlet, Set.of(cashierRole), true);
         createUserIfAbsent("waiter", "waiter@restomaster.io", "Waiter@123", "Bob Waiter", "+1-555-0103", defaultOutlet, Set.of(waiterRole), true);
+        createUserIfAbsent("customer", "customer@restomaster.io", "Customer@123", "RestoMaster Customer", "+91 98765 43210", defaultOutlet, Set.of(customerRole), true);
         createUserIfAbsent("kitchen", "kitchen@restomaster.io", "Kitchen@123", "Chef Mario", "+1-555-0104", defaultOutlet, Set.of(kitchenRole), true);
         createUserIfAbsent("inventory", "inventory@restomaster.io", "Inventory@123", "Dave Inventory", "+1-555-0105", defaultOutlet, Set.of(inventoryRole), true);
         createUserIfAbsent("inactive_user", "inactive@restomaster.io", "Inactive@123", "Deactivated Staff", "+1-555-0199", defaultOutlet, Set.of(cashierRole), false);
