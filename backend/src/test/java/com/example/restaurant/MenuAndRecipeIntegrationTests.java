@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
+@SuppressWarnings("null")
 class MenuAndRecipeIntegrationTests {
 
     @Autowired
@@ -279,15 +280,14 @@ class MenuAndRecipeIntegrationTests {
                 )
         );
 
-        MvcResult saveRes = mockMvc.perform(post("/api/menu/recipes")
+        mockMvc.perform(post("/api/menu/recipes")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(recipeReq)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.items.length()").value(2))
                 .andExpect(jsonPath("$.data.totalCost").isNumber())
-                .andExpect(jsonPath("$.data.profitMargin").isNumber())
-                .andReturn();
+                .andExpect(jsonPath("$.data.profitMargin").isNumber());
 
         // 4. Fetch Recipe by MenuItem ID
         mockMvc.perform(get("/api/menu/recipes/item/" + pepperoniId)

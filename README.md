@@ -33,7 +33,7 @@ restaurant-management-system/
 ### 1. Prerequisites
 - Node.js 18+ & npm 9+
 - Java 21+ (OpenJDK 21 or 25)
-- Maven 3.9+ (or use included `mvnw.cmd`)
+- Maven 3.9+ (or use the included `mvnw` on Linux/macOS or `mvnw.cmd` on Windows)
 
 ### 2. Running Frontend
 ```bash
@@ -46,7 +46,7 @@ npm run dev
 ### 3. Running Backend
 ```bash
 cd backend
-mvn clean spring-boot:run
+./mvnw clean spring-boot:run
 # Running on http://localhost:8080
 # Swagger UI available at: http://localhost:8080/swagger-ui.html
 ```
