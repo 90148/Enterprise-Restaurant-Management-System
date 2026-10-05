@@ -15,7 +15,6 @@ import com.example.restaurant.dto.recipe.SaveRecipeRequest;
 import com.example.restaurant.entity.InventoryTransactionType;
 import com.example.restaurant.entity.OrderType;
 import com.example.restaurant.entity.PaymentMethod;
-import com.example.restaurant.entity.PurchaseOrderStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
+@SuppressWarnings({"null", "unused"})
 class InventoryAndPurchasingIntegrationTests {
 
     @Autowired
@@ -114,7 +114,7 @@ class InventoryAndPurchasingIntegrationTests {
 
         // 1. Positive adjustment (restock)
         AdjustStockRequest addReq = new AdjustStockRequest(new BigDecimal("25.000"), InventoryTransactionType.ADJUSTMENT, "Weekly shipment restock");
-        MvcResult addRes = mockMvc.perform(post("/api/inventory/items/" + itemId + "/adjust")
+        mockMvc.perform(post("/api/inventory/items/" + itemId + "/adjust")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(addReq)))
