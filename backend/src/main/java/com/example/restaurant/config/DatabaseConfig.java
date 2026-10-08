@@ -23,11 +23,19 @@ public class DatabaseConfig {
         String url = properties.getUrl();
         String username = properties.getUsername();
         String password = properties.getPassword();
-
-        // Support Render / Heroku DATABASE_URL format: postgres://user:password@host:port/dbname
         String envDbUrl = System.getenv("DATABASE_URL");
-        if ((url == null || url.isEmpty() || url.contains("localhost")) && envDbUrl != null && !envDbUrl.isEmpty()) {
-            url = envDbUrl;
+        String driverClass = "org.postgresql.Driver";
+
+        if (url == null || url.isEmpty() || url.contains("localhost:5432")) {
+            if (envDbUrl != null && !envDbUrl.isEmpty()) {
+                url = envDbUrl;
+            } else {
+                log.warn("No external DATABASE_URL found on Render. Falling back to embedded H2 database to ensure container boots successfully.");
+                url = "jdbc:h2:mem:restaurant_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL";
+                username = "sa";
+                password = "";
+                driverClass = "org.h2.Driver";
+            }
         }
 
         if (url != null) {
@@ -64,6 +72,7 @@ public class DatabaseConfig {
                 .url(url)
                 .username(username)
                 .password(password)
+                .driverClassName(driverClass)
                 .build();
     }
 }
