@@ -36,7 +36,7 @@ class WebSocketManager {
   private handlers: Set<MessageHandler> = new Set();
   private isConnected = false;
 
-  public connect(url: string = 'http://localhost:8080/ws') {
+  public connect(url: string = import.meta.env.VITE_WS_URL || 'https://enterprise-restaurant-management-system-2.onrender.com/ws') {
     if (this.client && (this.isConnected || this.client.active)) {
       return;
     }

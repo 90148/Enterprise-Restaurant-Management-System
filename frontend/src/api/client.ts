@@ -3,7 +3,7 @@ import tokenService from '@/services/tokenService';
 import type { ApiResponse } from '@/types/api';
 import type { AuthResponse } from '@/types/auth';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://enterprise-restaurant-management-system-2.onrender.com/api';
 
 export const apiClient = axios.create({
   baseURL,
