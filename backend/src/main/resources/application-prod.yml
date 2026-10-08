@@ -1,18 +1,17 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:${DB_URL:jdbc:postgresql://localhost:5432/restaurant_db}}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:postgres}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:postgres}}
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:${DB_URL:jdbc:h2:mem:restaurant_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL}}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:sa}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: ${JPA_DIALECT:org.hibernate.dialect.H2Dialect}
     hibernate:
       ddl-auto: update
     show-sql: false
   flyway:
-    enabled: true
+    enabled: false
     baseline-on-migrate: true
-    out-of-order: true
 
 logging:
   level:
