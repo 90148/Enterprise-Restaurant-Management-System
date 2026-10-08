@@ -32,7 +32,6 @@ public class OutletController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('OUTLET_VIEW')")
     @Operation(summary = "Get paginated outlets list")
     public ResponseEntity<ApiResponse<PagedResponse<OutletDto>>> getOutlets(
             @RequestParam(required = false) String search,
@@ -51,14 +50,12 @@ public class OutletController {
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasAuthority('OUTLET_VIEW')")
     @Operation(summary = "Get all active outlets for dropdown selector")
     public ResponseEntity<ApiResponse<List<OutletDto>>> getActiveOutlets() {
         return ResponseEntity.ok(ApiResponse.ok(outletService.getAllActiveOutlets()));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('OUTLET_VIEW')")
     @Operation(summary = "Get outlet details by ID")
     public ResponseEntity<ApiResponse<OutletDto>> getOutletById(@PathVariable String id) {
         return ResponseEntity.ok(ApiResponse.ok(outletService.getOutletById(id)));

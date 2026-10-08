@@ -68,7 +68,7 @@ apiClient.interceptors.response.use(
 
       if (!refreshToken) {
         tokenService.clearSession();
-        if (window.location.pathname !== '/login') {
+        if (window.location.pathname !== '/login' && !window.location.pathname.startsWith('/customer')) {
           window.location.href = '/login?expired=true';
         }
         return Promise.reject(error);
@@ -110,7 +110,7 @@ apiClient.interceptors.response.use(
       } catch (refreshErr) {
         processQueue(refreshErr, null);
         tokenService.clearSession();
-        if (window.location.pathname !== '/login') {
+        if (window.location.pathname !== '/login' && !window.location.pathname.startsWith('/customer')) {
           window.location.href = '/login?expired=true';
         }
         return Promise.reject(refreshErr);

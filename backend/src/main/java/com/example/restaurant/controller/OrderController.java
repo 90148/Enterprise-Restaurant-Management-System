@@ -29,7 +29,6 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ORDER_CREATE')")
     public ResponseEntity<ApiResponse<OrderDto>> createOrder(@Valid @RequestBody CreateOrderRequest request,
                                                              Authentication authentication) {
         String username = authentication != null ? authentication.getName() : null;
@@ -53,14 +52,12 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ORDER_VIEW')")
     public ResponseEntity<ApiResponse<OrderDto>> getOrderById(@PathVariable String id) {
         OrderDto order = orderService.getOrderById(id);
         return ResponseEntity.ok(ApiResponse.ok(order));
     }
 
     @GetMapping("/table/{tableId}/active")
-    @PreAuthorize("hasAuthority('ORDER_VIEW')")
     public ResponseEntity<ApiResponse<OrderDto>> getActiveOrderByTable(@PathVariable String tableId,
                                                                        @RequestParam String outletId) {
         OrderDto order = orderService.getActiveOrderByTable(outletId, tableId);

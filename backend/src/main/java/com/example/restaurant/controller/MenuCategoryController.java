@@ -24,7 +24,6 @@ public class MenuCategoryController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('MENU_VIEW')")
     public ResponseEntity<ApiResponse<List<MenuCategoryDto>>> getCategories(
             @RequestParam String outletId,
             @RequestParam(required = false) Boolean activeOnly) {
@@ -33,7 +32,6 @@ public class MenuCategoryController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('MENU_VIEW')")
     public ResponseEntity<ApiResponse<MenuCategoryDto>> getCategoryById(@PathVariable String id) {
         MenuCategoryDto cat = categoryService.getCategoryById(id);
         return ResponseEntity.ok(ApiResponse.ok(cat));

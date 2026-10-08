@@ -28,7 +28,6 @@ public class MenuItemController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('MENU_VIEW')")
     public ResponseEntity<ApiResponse<PagedResponse<MenuItemDto>>> getMenuItems(
             @RequestParam(required = false) String outletId,
             @RequestParam(required = false) String categoryId,
@@ -49,7 +48,6 @@ public class MenuItemController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('MENU_VIEW')")
     public ResponseEntity<ApiResponse<MenuItemDto>> getMenuItemById(@PathVariable String id) {
         MenuItemDto item = menuItemService.getMenuItemById(id);
         return ResponseEntity.ok(ApiResponse.ok(item));
