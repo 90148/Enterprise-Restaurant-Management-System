@@ -5,7 +5,6 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
     driver-class-name: ${DB_DRIVER:org.h2.Driver}
   jpa:
-    database-platform: ${JPA_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
     hibernate:
       ddl-auto: update
     show-sql: false

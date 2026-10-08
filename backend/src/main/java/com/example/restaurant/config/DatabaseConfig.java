@@ -38,34 +38,38 @@ public class DatabaseConfig {
             }
         }
 
-        if (url != null) {
-            if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
-                try {
-                    log.info("Transforming Render DATABASE_URL into JDBC format...");
-                    String cleanUrl = url.replace("postgres://", "http://").replace("postgresql://", "http://");
-                    URI uri = new URI(cleanUrl);
+        if (url != null && (url.startsWith("postgres://") || url.startsWith("postgresql://"))) {
+            try {
+                log.info("Transforming Render DATABASE_URL into JDBC format...");
+                String cleanUrl = url.replace("postgres://", "http://").replace("postgresql://", "http://");
+                URI uri = new URI(cleanUrl);
 
-                    if (uri.getUserInfo() != null) {
-                        String[] userInfo = uri.getUserInfo().split(":");
-                        username = userInfo[0];
-                        password = userInfo.length > 1 ? userInfo[1] : "";
-                    }
+                if (uri.getUserInfo() != null) {
+                    String[] userInfo = uri.getUserInfo().split(":");
+                    username = userInfo[0];
+                    password = userInfo.length > 1 ? userInfo[1] : "";
+                }
 
-                    int port = uri.getPort() == -1 ? 5432 : uri.getPort();
-                    String host = uri.getHost();
-                    String path = uri.getPath();
+                int port = uri.getPort() == -1 ? 5432 : uri.getPort();
+                String host = uri.getHost();
+                String path = uri.getPath();
 
-                    url = "jdbc:postgresql://" + host + ":" + port + path;
-                    log.info("Database URL successfully transformed for JDBC: jdbc:postgresql://{}:{}{}", host, port, path);
-                } catch (Exception e) {
-                    log.warn("Failed to parse DATABASE_URL cleanly, attempting direct prefix replacement: {}", e.getMessage());
-                    if (url.startsWith("postgres://")) {
-                        url = "jdbc:postgresql://" + url.substring("postgres://".length());
-                    } else if (url.startsWith("postgresql://")) {
-                        url = "jdbc:" + url;
-                    }
+                url = "jdbc:postgresql://" + host + ":" + port + path;
+                log.info("Database URL successfully transformed for JDBC: jdbc:postgresql://{}:{}{}", host, port, path);
+            } catch (Exception e) {
+                log.warn("Failed to parse DATABASE_URL cleanly, attempting direct prefix replacement: {}", e.getMessage());
+                if (url.startsWith("postgres://")) {
+                    url = "jdbc:postgresql://" + url.substring("postgres://".length());
+                } else if (url.startsWith("postgresql://")) {
+                    url = "jdbc:" + url;
                 }
             }
+        }
+
+        if (url != null && url.startsWith("jdbc:h2:")) {
+            driverClass = "org.h2.Driver";
+        } else {
+            driverClass = "org.postgresql.Driver";
         }
 
         return properties.initializeDataSourceBuilder()
