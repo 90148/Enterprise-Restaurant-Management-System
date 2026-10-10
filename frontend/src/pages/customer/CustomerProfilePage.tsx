@@ -220,19 +220,6 @@ export const CustomerProfilePage: React.FC = () => {
             <p className="text-[10px] text-slate-400">Quick 1-click reordering</p>
           </div>
         </Link>
-
-        <Link
-          to="/dashboard"
-          className="p-4 bg-slate-900 hover:bg-slate-850 border border-slate-800 rounded-2xl flex items-center gap-3 transition-colors group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white">Staff Management</h4>
-            <p className="text-[10px] text-slate-400">Switch to POS / KDS portal</p>
-          </div>
-        </Link>
       </div>
     </div>
   );

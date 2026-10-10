@@ -11,7 +11,6 @@ import {
   Sparkles,
   UtensilsCrossed,
   BellRing,
-  ExternalLink,
 } from 'lucide-react';
 import { useCustomerContext } from '@/context/CustomerContext';
 import { useCustomerCartContext } from '@/context/CustomerCartContext';
@@ -221,16 +220,6 @@ export const CustomerHeader: React.FC = () => {
               {customer.name}
             </span>
           </button>
-
-          {/* Staff POS & Admin Switcher */}
-          <Link
-            to="/dashboard"
-            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg transition-colors"
-            title="Switch to Staff POS & Kitchen Admin"
-          >
-            <span>Staff POS</span>
-            <ExternalLink className="w-3 h-3" />
-          </Link>
         </div>
       </div>
 
