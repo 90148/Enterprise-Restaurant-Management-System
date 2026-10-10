@@ -17,7 +17,7 @@ export const CustomerAuthModal: React.FC = () => {
     updateProfile({
       name: name.trim() || 'Guest Diner',
       phone: phone.trim() || '+91 98765 43210',
-      email: email.trim() || 'guest@restomaster.com',
+      email: email.trim() || 'guest@novarestomaster.com',
     });
     setIsSaved(true);
     setTimeout(() => {
@@ -70,21 +70,21 @@ export const CustomerAuthModal: React.FC = () => {
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => selectPreset('Surya', 'surya@restomaster.com', ['NON_VEG'])}
+                onClick={() => selectPreset('Surya', 'surya@novarestomaster.com', ['NON_VEG'])}
                 className="flex-1 py-1.5 px-2 text-[11px] bg-slate-800 hover:bg-amber-500/20 hover:text-amber-300 text-slate-200 rounded border border-slate-700 transition-colors text-center"
               >
                 Surya (Feast)
               </button>
               <button
                 type="button"
-                onClick={() => selectPreset('Priya', 'priya.veg@restomaster.com', ['VEG'])}
+                onClick={() => selectPreset('Priya', 'priya.veg@novarestomaster.com', ['VEG'])}
                 className="flex-1 py-1.5 px-2 text-[11px] bg-slate-800 hover:bg-emerald-500/20 hover:text-emerald-300 text-slate-200 rounded border border-slate-700 transition-colors text-center"
               >
                 Priya (Veg)
               </button>
               <button
                 type="button"
-                onClick={() => selectPreset('Chef Vikram', 'vikram.chef@restomaster.com', ['NON_VEG'])}
+                onClick={() => selectPreset('Chef Vikram', 'vikram.chef@novarestomaster.com', ['NON_VEG'])}
                 className="flex-1 py-1.5 px-2 text-[11px] bg-slate-800 hover:bg-blue-500/20 hover:text-blue-300 text-slate-200 rounded border border-slate-700 transition-colors text-center"
               >
                 Vikram (VIP)

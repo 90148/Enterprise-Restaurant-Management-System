@@ -177,7 +177,7 @@ export const PaymentGatewayModal: React.FC<PaymentGatewayModalProps> = ({
                     A secure intent link will trigger your <strong>{upiApp}</strong> application.
                   </p>
                   <span className="inline-block px-3 py-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-lg text-xs font-mono">
-                    VPA: restomaster.pos@icici
+                    VPA: novarestomaster.pos@icici
                   </span>
                 </div>
               )}

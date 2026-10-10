@@ -73,7 +73,7 @@ export const CustomerHeader: React.FC = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight truncate bg-gradient-to-r from-white via-slate-100 to-amber-200 bg-clip-text text-transparent">
-                  RestoMaster
+                  NovaRestoMaster
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded">
                   Dining

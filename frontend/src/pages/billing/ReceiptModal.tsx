@@ -168,7 +168,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ bill, onClose }) => 
           <div className="text-center pt-2 space-y-1 text-[11px]">
             <p className="font-bold">THANK YOU FOR YOUR VISIT!</p>
             <p className="text-slate-600">Please visit again soon.</p>
-            <p className="text-[10px] text-slate-400 font-sans mt-2">Powered by RestoMaster POS</p>
+            <p className="text-[10px] text-slate-400 font-sans mt-2">Powered by NovaRestoMaster POS</p>
           </div>
         </div>
       </div>

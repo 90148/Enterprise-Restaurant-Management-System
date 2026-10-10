@@ -65,7 +65,7 @@ export const LoginPage: React.FC = () => {
           <div className="inline-flex p-3 bg-emerald-50 text-emerald-600 rounded-2xl mb-3 shadow-inner">
             <Utensils className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900">RestoMaster POS</h2>
+          <h2 className="text-2xl font-bold text-slate-900">NovaRestoMaster POS</h2>
           <p className="text-xs text-slate-500 mt-1">Enterprise Multi-Outlet Restaurant Management</p>
         </div>
 

@@ -302,7 +302,7 @@ export const OutletListPage: React.FC = () => {
               type="email"
               {...registerAdd('email')}
               error={addErrors.email?.message}
-              placeholder="uptown@restomaster.io"
+              placeholder="uptown@novarestomaster.io"
             />
           </div>
 

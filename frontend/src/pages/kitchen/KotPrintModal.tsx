@@ -126,7 +126,7 @@ export const KotPrintModal: React.FC<KotPrintModalProps> = ({ ticket, onClose })
           {/* Footer */}
           <div className="text-center pt-2 space-y-1">
             <p className="text-[11px]">Total Items: {ticket.items.reduce((acc, curr) => acc + curr.quantity, 0)}</p>
-            <p className="text-[10px] text-slate-500 font-sans">RestoMaster POS & KDS</p>
+            <p className="text-[10px] text-slate-500 font-sans">NovaRestoMaster POS & KDS</p>
           </div>
         </div>
       </div>

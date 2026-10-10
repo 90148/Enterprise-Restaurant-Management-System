@@ -3,7 +3,7 @@ import { FoodCategory, FoodItem, OutletInfo, Coupon, CustomerProfile } from '@/t
 export const INITIAL_CUSTOMER_PROFILE: CustomerProfile = {
   id: 'cust-101',
   name: 'Surya',
-  email: 'surya.customer@restomaster.com',
+  email: 'surya.customer@novarestomaster.com',
   phone: '+91 98765 43210',
   avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
   addresses: [

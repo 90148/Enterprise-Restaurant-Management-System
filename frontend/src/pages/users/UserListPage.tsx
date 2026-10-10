@@ -352,7 +352,7 @@ export const UserListPage: React.FC = () => {
               type="email"
               {...registerAdd('email')}
               error={addErrors.email?.message}
-              placeholder="john@restomaster.io"
+              placeholder="john@novarestomaster.io"
             />
             <Input
               label="Initial Password *"

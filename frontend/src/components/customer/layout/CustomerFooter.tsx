@@ -54,7 +54,7 @@ export const CustomerFooter: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-bold">
               <UtensilsCrossed className="w-4 h-4" />
             </div>
-            <span className="font-serif text-lg font-bold text-white tracking-tight">RestoMaster</span>
+            <span className="font-serif text-lg font-bold text-white tracking-tight">NovaRestoMaster</span>
           </div>
           <p className="text-xs leading-relaxed text-slate-400">
             A harmonious fusion of royal culinary traditions, clay tandoor perfection, wood-fired hearths, and seamless modern dining technology.
@@ -122,15 +122,7 @@ export const CustomerFooter: React.FC = () => {
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-amber-400" />
-              <span>dsp.trend@restomaster.com</span>
-            </li>
-            <li className="pt-2">
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 text-[11px] transition-colors"
-              >
-                <span>Staff & Management Portal</span>
-              </Link>
+              <span>dsp.trend@novarestomaster.com</span>
             </li>
           </ul>
         </div>
@@ -139,7 +131,7 @@ export const CustomerFooter: React.FC = () => {
       {/* Bottom Bar */}
       <div className="border-t border-slate-800/60 py-4 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
-          <p>© {new Date().getFullYear()} RestoMaster Dining Platform. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} NovaRestoMaster Dining Platform. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link to="/customer/offers" className="hover:text-amber-400 transition-colors">
               Special Offers

@@ -12,7 +12,7 @@ import { CustomizationModal } from '../menu/CustomizationModal';
 import { CallWaiterModal } from '../dinein/CallWaiterModal';
 
 const whatsappUrl =
-  'https://wa.me/919014822734?text=Hello%20RestoMaster%2C%20I%20need%20assistance.';
+  'https://wa.me/919014822734?text=Hello%20NovaRestoMaster%2C%20I%20need%20assistance.';
 
 export const CustomerLayout: React.FC = () => {
   return (
@@ -39,7 +39,7 @@ export const CustomerLayout: React.FC = () => {
         href={whatsappUrl}
         target="_blank"
         rel="noreferrer"
-        aria-label="Chat with RestoMaster on WhatsApp"
+        aria-label="Chat with NovaRestoMaster on WhatsApp"
         title="Chat with us on WhatsApp"
         className="fixed right-4 bottom-24 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-950/40 transition-transform hover:scale-105 hover:bg-[#20bd5a] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 focus:ring-offset-slate-950 md:right-6 md:bottom-6"
       >

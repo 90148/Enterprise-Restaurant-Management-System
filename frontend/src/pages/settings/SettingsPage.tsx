@@ -234,7 +234,7 @@ export const SettingsPage: React.FC = () => {
                 <Input
                   value={form.restaurantName}
                   onChange={(e) => setForm({ ...form, restaurantName: e.target.value })}
-                  placeholder="e.g. RestoMaster Flagship"
+                  placeholder="e.g. NovaRestoMaster Flagship"
                 />
               </div>
 
@@ -449,7 +449,7 @@ export const SettingsPage: React.FC = () => {
                   onChange={(e) => setForm({ ...form, receiptHeader: e.target.value })}
                   rows={3}
                   className="w-full text-xs rounded-lg border border-slate-300 p-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  placeholder="e.g. Welcome to RestoMaster! 123 Gourmet Ave, Food City"
+                  placeholder="e.g. Welcome to NovaRestoMaster! 123 Gourmet Ave, Food City"
                 />
               </div>
 

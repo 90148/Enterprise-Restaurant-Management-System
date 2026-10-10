@@ -62,7 +62,7 @@ export const CartDrawer: React.FC = () => {
             <div>
               <h3 className="font-bold text-white text-base">Your Gourmet Cart</h3>
               <p className="text-[11px] text-slate-400">
-                {cartSummary.itemCount} items from {activeOutlet?.name || 'RestoMaster'}
+                {cartSummary.itemCount} items from {activeOutlet?.name || 'NovaRestoMaster'}
               </p>
             </div>
           </div>

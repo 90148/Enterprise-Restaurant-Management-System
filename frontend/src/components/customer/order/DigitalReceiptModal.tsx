@@ -17,13 +17,13 @@ export const DigitalReceiptModal: React.FC<DigitalReceiptModalProps> = ({ order,
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: `RestoMaster Receipt #${order.orderNumber}`,
+        title: `NovaRestoMaster Receipt #${order.orderNumber}`,
         text: `Here is my dining receipt for Order #${order.orderNumber} at ${order.outletName}. Total: ₹${order.grandTotal}`,
         url: window.location.href,
       }).catch(() => {});
     } else {
       navigator.clipboard.writeText(
-        `RestoMaster Receipt #${order.orderNumber}\nOutlet: ${order.outletName}\nAmount: ₹${order.grandTotal}\nPaid via: ${order.paymentMethod}`
+        `NovaRestoMaster Receipt #${order.orderNumber}\nOutlet: ${order.outletName}\nAmount: ₹${order.grandTotal}\nPaid via: ${order.paymentMethod}`
       );
       alert('Receipt summary copied to clipboard!');
     }
